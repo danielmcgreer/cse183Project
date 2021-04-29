@@ -1,0 +1,43 @@
+[[extend 'layout.html']]
+
+<div class="section">
+
+  <h1 class="title">Found Reviews</h1>
+  
+  <a class="button is-success" href="[[=URL('search_course')]]">
+    <span>Search Another Course</span>
+  </a>
+  
+  <a class="button is-success" href="[[=URL('index')]]">
+    <span>Back to Main Page</span>
+  </a>
+
+  <div class="container">
+    <table class="table is-striped is-fullwidth">
+      <tr>
+        <th>Major</th>
+        <th>Number</th>
+        <th>Name</th>
+        <th>teacher</th>
+        <th>Rating</th>
+        <th>Review</th>
+        <th></th>
+        <th></th>
+      </tr>
+      [[for row in rows:]]
+      <tr>
+        <td>[[=row.major_iden]]</td>
+        <td>[[=row.class_number]]</td>
+        <td>[[=row.class_name]]</td>
+        <td>[[=row.teacher]]</td>
+        <td>[[=row.rating]]/5</td>
+        <td>[[=row.review]]</td>
+
+      </tr>
+      [[pass]]
+    </table>
+  </div>
+
+
+
+</div>
