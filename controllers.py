@@ -105,7 +105,7 @@ def delete(review_id=None):
 @action('search_course', method=["GET", "POST"])
 @action.uses(db, auth, 'search_course.html')
 def search_course():
-    form = Form([Field('department', requires=IS_NOT_EMPTY()),Field('class_number', 'integer'),],
+    form = Form([Field('department', requires=IS_NOT_EMPTY()),Field('class_number'),],
                 csrf_session=session, formstyle=FormStyleBulma
                 )
     #TODO if it is not accepted

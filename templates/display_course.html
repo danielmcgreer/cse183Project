@@ -1,41 +1,81 @@
 [[extend 'layout.html']]
 
 <div class="section">
-
-  <h1 class="title">Found Reviews</h1>
-  
-  <a class="button is-success" href="[[=URL('search_course')]]">
-    <span>Search Another Course</span>
-  </a>
-  
-  <a class="button is-success" href="[[=URL('index')]]">
-    <span>Back to Main Page</span>
-  </a>
+  [[for row in rows:]]
+  <h1 class="title">
+      [[=row.courses.department]] [[=row.courses.class_number]]: [[=row.courses.class_name]]
+  </h1>
+  <div class="box">
+      <h3 class="title">
+            Course Description
+      </h3>
+      <div>
+          dummy text right now to put here. Class is about making a web page.
+      </div>
+  </div>
 
   <div class="container">
-    <table class="table is-striped is-fullwidth">
-      <tr>
-        <th>Major</th>
-        <th>Number</th>
-        <th>Name</th>
-        <th>teacher</th>
-        <th>Rating</th>
-        <th>Review</th>
-        <th></th>
-        <th></th>
-      </tr>
-      [[for row in rows:]]
-      <tr>
-        <td>[[=row.courses.department]]</td>
-        <td>[[=row.courses.class_number]]</td>
-        <td>[[=row.courses.class_name]]</td>
-        <td>[[=row.reviews.teacher]]</td>
-        <td>[[=row.reviews.rating]]/5</td>
-        <td>[[=row.reviews.review]]</td>
+    <div class="reviews">
+        <h2 class="title">
+            [[=row.courses.department]] [[=row.courses.class_number]] Reviews 
+        </h2>
+        <div>
+            <a class="button is-primary" href="[[=URL('add_review')]]">
+                <span>Write a Review</span>
+            </a>
+            <!--
+            <div class="dropdown is-active">
+              <div class="dropdown-trigger">
+                <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                  <span>Filter</span>
+                  <span class="icon is-small">
+                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                  </span>
+                </button>
+              </div>
+              <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                <div class="dropdown-content">
+                  <a href="#" class="dropdown-item">
+                    Dropdown item
+                  </a>
+                  <hr class="dropdown-divider">
+                  <a href="#" class="dropdown-item">
+                    Other dropdown item
+                  </a>
+                </div>
+              </div>
+            </div>
+            -->
+        </div>
+       
+        <div class="box">
+            <span class="tag is-link is-normal"><b>John Smith</b></span>
+            <br>
+            <div><b>Teacher:</b> [[=row.reviews.teacher]]</div>
+            <div><b>Rating:</b> [[=row.reviews.rating]]/5</div>
+            <div><b>Review: </b>[[=row.reviews.review]]</div>
+            <span class="icon is-small has-text-success">
+                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                <span>0</span>
+            </span>
+            <span class="icon is-small has-text-danger">
+                <i class="fa fa-thumbs-down" aria-hidden="true" style="padding-left: 20px;"></i>
+                <span>0</span>
+            </span>
+        </div>
 
-      </tr>
-      [[pass]]
-    </table>
+    </div>
+    <br>
+    <a class="button is-primary" href="[[=URL('search_course')]]">
+        <span>Search Another Course</span>
+    </a>
+    <a class="button is-primary" href="[[=URL('index')]]">
+        <span>Back</span>
+    </a>
+    
+
+    [[pass]]
+ 
   </div>
 
 

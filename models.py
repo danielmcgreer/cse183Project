@@ -16,7 +16,7 @@ def get_time():
 db.define_table(
     'courses',
     Field('department', requires=IS_NOT_EMPTY()),
-    Field('class_number',  'integer', requires=IS_NOT_EMPTY()),
+    Field('class_number', requires=IS_NOT_EMPTY()),
     Field('class_name', requires=IS_NOT_EMPTY()),
     Field('class_description'),
 ) 
@@ -30,7 +30,7 @@ db.define_table(
     Field('course_id', 'reference_courses'),
     Field('created_by', default=get_user_email),
     Field('teacher',),
-    Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
+    Field('rating', 'integer', requires=IS_INT_IN_RANGE(0, 5)),
     Field('review', 'text'),
 
 )
