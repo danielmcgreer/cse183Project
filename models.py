@@ -12,16 +12,23 @@ def get_user_email():
 
 def get_time():
     return datetime.datetime.utcnow()
+    
+db.define_table(
+    'courses',
+    Field('department', requires=IS_NOT_EMPTY()),
+    Field('class_number',  'integer', requires=IS_NOT_EMPTY()),
+    Field('class_name', requires=IS_NOT_EMPTY()),
+    Field('class_description'),
+) 
 
 #TODO make a class reference to a different table instead
-#TODO make major_iden like "CSE" one of those enums likes hes shown
+#TODO make department like "CSE" one of those enums likes hes shown
 #TODO allow some null inputs?
+#TODO added a created date
 db.define_table(
     'reviews',
-    Field('major_iden', requires=IS_NOT_EMPTY()),
-    Field('class_number', 'integer'),
+    Field('course_id', 'reference_courses'),
     Field('created_by', default=get_user_email),
-    Field('class_name', requires=IS_NOT_EMPTY()),
     Field('teacher',),
     Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
     Field('review', 'text'),

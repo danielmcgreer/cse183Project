@@ -26,12 +26,12 @@
       </tr>
       [[for row in rows:]]
       <tr>
-        <td>[[=row.major_iden]]</td>
-        <td>[[=row.class_number]]</td>
-        <td>[[=row.class_name]]</td>
-        <td>[[=row.teacher]]</td>
-        <td>[[=row.rating]]/5</td>
-        <td>[[=row.review]]</td>
+        <td>[[=row.courses.department]]</td>
+        <td>[[=row.courses.class_number]]</td>
+        <td>[[=row.courses.class_name]]</td>
+        <td>[[=row.reviews.teacher]]</td>
+        <td>[[=row.reviews.rating]]/5</td>
+        <td>[[=row.reviews.review]]</td>
 
       </tr>
       [[pass]]
