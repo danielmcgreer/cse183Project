@@ -50,6 +50,7 @@ def index():
 @action('add_review', method=["GET", "POST"])
 @action.uses(db, session, auth.user, 'add_review.html')
 def add_review():
+    #Create a form for all fields for now
     form = Form([Field('department', requires=IS_NOT_EMPTY()),
                 Field('class_number',  'integer', requires=IS_NOT_EMPTY()),
                 Field('class_name', requires=IS_NOT_EMPTY()),
@@ -57,18 +58,22 @@ def add_review():
                 Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
                 Field('review', 'text')],
                 csrf_session=session, formstyle=FormStyleBulma)
+    
+    # if form is accepted
     if form.accepted:
+        # Check if there is a course that already exists with the entered info
         if db((db.courses.department == form.vars["department"]) &
               (db.courses.class_number == form.vars["class_number"]) &
               (db.courses.class_name == form.vars["class_name"])).select().first() == None:
-              print("this is the if")
+              # If there is no course with the inputted info then create the course by inserting its info into the courses table
               db.courses.insert(department = form.vars["department"],
                                 class_number = form.vars["class_number"],
                                 class_name = form.vars["class_name"])
-        
+        # Grab the course that matches the filled fileds (its Id is needed)
         course = db((db.courses.department == form.vars["department"]) &
               (db.courses.class_number == form.vars["class_number"]) &
               (db.courses.class_name == form.vars["class_name"])).select().first()
+        # insert the review into the reviews table
         db.reviews.insert(teacher = form.vars["teacher"],
                          rating = form.vars["rating"],
                          review = form.vars["review"], 
