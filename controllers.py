@@ -105,7 +105,7 @@ def delete(review_id=None):
 @action('search_course', method=["GET", "POST"])
 @action.uses(db, auth, 'search_course.html')
 def search_course():
-    form = Form([Field('department', requires=IS_NOT_EMPTY()),Field('class_number', 'integer'),],
+    form = Form([Field('department', default=""),Field('class_number', 'integer', default=-1),],
                 csrf_session=session, formstyle=FormStyleBulma
                 )
     #TODO if it is not accepted
@@ -118,10 +118,16 @@ def search_course():
 @action.uses(db, auth, 'display_course.html')
 def display_course(major_id=None, course_num=None):
 #TODO if args eq none then do something
-    rows = db((db.courses.department == major_id) & 
-            (db.courses.class_number == course_num) & 
-            (db.courses.id == db.reviews.course_id)).select()
-    return dict(rows=rows, url_signer=url_signer) 
+    perfectMatches = db((db.courses.department == major_id) & 
+                        (db.courses.class_number == course_num) & 
+                        (db.courses.id == db.reviews.course_id)).select()
+    closeMatches1 = db((db.courses.department == major_id) & 
+                        (db.courses.class_number != course_num) & 
+                        (db.courses.id == db.reviews.course_id)).select() 
+    closeMatches2 = db((db.courses.department != major_id) & 
+                        (db.courses.class_number == course_num) & 
+                        (db.courses.id == db.reviews.course_id)).select()
+    return dict(perfectMatches=perfectMatches, closeMatches1=closeMatches1, closeMatches2=closeMatches2,   url_signer=url_signer) 
   
   
 @action('users_reviews')

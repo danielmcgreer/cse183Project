@@ -24,17 +24,39 @@
         <th></th>
         <th></th>
       </tr>
-      [[for row in rows:]]
+      [[for match in perfectMatches:]]
       <tr>
-        <td>[[=row.courses.department]]</td>
-        <td>[[=row.courses.class_number]]</td>
-        <td>[[=row.courses.class_name]]</td>
-        <td>[[=row.reviews.teacher]]</td>
-        <td>[[=row.reviews.rating]]/5</td>
-        <td>[[=row.reviews.review]]</td>
+        <td>[[=match.courses.department]]</td>
+        <td>[[=match.courses.class_number]]</td>
+        <td>[[=match.courses.class_name]]</td>
+        <td>[[=match.reviews.teacher]]</td>
+        <td>[[=match.reviews.rating]]/5</td>
+        <td>[[=match.reviews.review]]</td>
+      </tr>
+	  [[pass]]
 
+      [[for match in closeMatches1:]]
+      <tr>
+        <td>[[=match.courses.department]]</td>
+        <td>[[=match.courses.class_number]]</td>
+        <td>[[=match.courses.class_name]]</td>
+        <td>[[=match.reviews.teacher]]</td>
+        <td>[[=match.reviews.rating]]/5</td>
+        <td>[[=match.reviews.review]]</td>
       </tr>
       [[pass]]
+	  
+      [[for match in closeMatches2:]]
+      <tr>
+        <td>[[=match.courses.department]]</td>
+        <td>[[=match.courses.class_number]]</td>
+        <td>[[=match.courses.class_name]]</td>
+        <td>[[=match.reviews.teacher]]</td>
+        <td>[[=match.reviews.rating]]/5</td>
+        <td>[[=match.reviews.review]]</td>
+      </tr>
+      [[pass]]
+	  
     </table>
   </div>
 
