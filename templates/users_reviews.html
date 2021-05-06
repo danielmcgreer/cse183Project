@@ -2,7 +2,7 @@
 
 <div class="section">
 
-  <h1 class="title">Found Reviews</h1>
+  <h1 class="title">My Reviews</h1>
   
   <a class="button is-success" href="[[=URL('search_course')]]">
     <span>Search Another Course</span>
@@ -15,10 +15,10 @@
   <div class="container">
     <table class="table is-striped is-fullwidth">
       <tr>
-        <th>Major</th>
+        <th>Course</th>
         <th>Number</th>
-        <th>Name</th>
-        <th>teacher</th>
+        <th>Major</th>
+        <th>Professor</th>
         <th>Rating</th>
         <th>Review</th>
         <th></th>
@@ -26,9 +26,9 @@
       </tr>
       [[for row in rows:]]
       <tr>
-        <td>[[=row.courses.department]]</td>
-        <td>[[=row.courses.class_number]]</td>
         <td>[[=row.courses.class_name]]</td>
+        <td>[[=row.courses.class_number]]</td>
+        <td>[[=row.courses.department]]</td>
         <td>[[=row.reviews.teacher]]</td>
         <td>[[=row.reviews.rating]]/5</td>
         <td>[[=row.reviews.review]]</td>
