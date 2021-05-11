@@ -19,14 +19,15 @@
         <th>Name</th>
         <th>Description</th>
         <th>Average rating</th>
-
+        <th></th>
+        <th></th>
       </tr>
       [[for match in allMatches:]]
       <tr>
         <td>[[=match.department]] [[=match.class_number]]</td>
         <td>[[=match.class_name]]</td>
-        <th>Description Will go here</th>
-        <th>Average rating will go here</th>
+        <td>Description Will go here</td>
+        <td>Average rating will go here</td>
         <td>
           <a class="button" href="[[=URL('display_reviews', match.id)]]">
             <span>Read Reviews</span>
