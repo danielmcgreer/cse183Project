@@ -15,26 +15,31 @@
   <div class="container">
     <table class="table is-striped is-fullwidth">
       <tr>
-        <th>Major</th>
-        <th>Number</th>
+        <th>Course identifier</th>
         <th>Name</th>
-        <th>teacher</th>
-        <th>Rating</th>
-        <th>Review</th>
-        <th></th>
-        <th></th>
-      </tr>
-      [[for row in rows:]]
-      <tr>
-        <td>[[=row.courses.department]]</td>
-        <td>[[=row.courses.class_number]]</td>
-        <td>[[=row.courses.class_name]]</td>
-        <td>[[=row.reviews.teacher]]</td>
-        <td>[[=row.reviews.rating]]/5</td>
-        <td>[[=row.reviews.review]]</td>
+        <th>Description</th>
+        <th>Average rating</th>
 
       </tr>
-      [[pass]]
+      [[for match in allMatches:]]
+      <tr>
+        <td>[[=match.department]] [[=match.class_number]]</td>
+        <td>[[=match.class_name]]</td>
+        <th>Description Will go here</th>
+        <th>Average rating will go here</th>
+        <td>
+          <a class="button" href="[[=URL('display_reviews', match.id)]]">
+            <span>Read Reviews</span>
+          </a>
+        </td>
+        <td>
+          <a class="button" href="[[=URL('write_reviews', match.id)]]">
+            <span>Write a Review</span>
+          </a>
+        </td>
+      </tr>
+	  [[pass]]
+	  
     </table>
   </div>
 
