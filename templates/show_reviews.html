@@ -1,0 +1,160 @@
+[[extend 'layout.html']]
+
+<style>
+[v-cloak] {
+     display: none;
+}
+</style>
+
+
+<div class="section" id="vue-target" v-cloak>
+    <!-- Put here your Vue.js template -->
+    <div class="section">
+      <h1 class="title">
+          [[=department]] [[=class_number]]: [[=class_name]]
+      </h1>
+      <div class="box">
+          <h3 class="title">
+                Course Description
+          </h3>
+          <div>
+              dummy text right now to put here. Class is about making a web page.
+          </div>
+      </div>
+    
+    <div class="reviews">
+        <h2 class="title">
+            [[=department]] [[=class_number]] Reviews 
+        </h2>
+        <div>
+            <a class="button is-primary" href="[[=URL('add_review')]]">
+                <span>Write a Review</span>
+            </a>
+            <div class="container block">
+                <section class="section">
+                    <div class="">
+                      <div v-if="new_review_showing" class= "is-fullwidth">
+                        <div class="field">
+                          <textarea v-model="review_text" class="textarea is-fullwidth" placeholder="Enter new review here"></textarea>
+                        </div>
+                        <button @click="send_review(); clear_new_review(); toggle_new_review()" class="button is-primary is-size-6">review</button>
+                        <button @click="clear_new_review(); toggle_new_review()" class="button is-warning is-size-6">Cancel</button>
+                      </div>
+                      <div v-if="!new_review_showing">
+                        <button @click="toggle_new_review()" class="button is-primary is-size-6">
+                          <i class="fa fa-plus fa-fw"></i>
+                        </button>
+                      </div>
+                    </div>
+                </section>
+                <!--
+                <div class="dropdown is-active">
+                  <div class="dropdown-trigger">
+                    <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                      <span>Filter</span>
+                      <span class="icon is-small">
+                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                      </span>
+                    </button>
+                  </div>
+                  <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                    <div class="dropdown-content">
+                      <a href="#" class="dropdown-item">
+                        Dropdown item
+                      </a>
+                      <hr class="dropdown-divider">
+                      <a href="#" class="dropdown-item">
+                        Other dropdown item
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                -->
+            </div>
+            
+            <section class="section">
+                <div class="tile is-ancestor"></div>
+                  <div class="tile is-vertical">
+                    <div v-for="review in reviews" class="tile is-child notification is-light">
+                      <div class="">
+                        <div>{{review.review_text}}</div>
+                        <div class="tag is-link is-normal">{{review.author}}</div>
+                      </div>
+                      <div class="">
+                        <div class="thumbs is-size-4">
+                          <span style="cursor: pointer" @click="delete_review(review.id)" v-if="review.user_email === user_email" class="has-text-danger is-pulled-right">
+                            <i class="fa fa-trash fa-fw"></i>
+                          </span>
+                          <span class="has-text-info" @mouseenter="toggle_hover_review(review.id)" @mouseleave="toggle_hover_review(0)">
+                            <span>
+                              <i @click="send_thumb(review.id, 0)" v-if="user_thumb_on_review(review, 1)" class="fa fa-flip-horizontal fa-thumbs-up" style="cursor: pointer"></i>
+                              <i @click="send_thumb(review.id, 1)" v-if="!user_thumb_on_review(review, 1)" class="fa fa-flip-horizontal fa-thumbs-o-up" style="cursor: pointer"></i>
+                            </span>
+                            <span>
+                              <i @click="send_thumb(review.id, 0)" v-if="user_thumb_on_review(review, -1)" class="fa fa-thumbs-down" style="cursor: pointer"></i>
+                              <i @click="send_thumb(review.id, -1)" v-if="!user_thumb_on_review(review, -1)" class="fa fa-thumbs-o-down" style="cursor: pointer"></i>
+                            </span>
+                          </span>
+                          <span v-if="hover_review === review.id" class="has-text-info">
+                            <span v-if="review.likes.length > 0"  class="is-size-7">
+                              Liked by
+                              <span v-for="like in review.likes">
+                                {{like.name}}
+                              </span>
+                            </span>
+                            <span v-if="review.dislikes.length > 0" class="is-size-7">
+                              Disliked by 
+                              <span v-for="dislike in review.dislikes">
+                                {{dislike.name}}
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+             </section>
+        </div>
+    </div>
+</div>
+
+
+<!-- Navigation Buttons --> 
+<a class="button is-primary" href="[[=URL('search_course')]]">
+    <span>Search Another Course</span>
+</a>
+<a class="button is-primary" href="[[=URL('index')]]">
+    <span>Back</span>
+</a>
+ 
+[[for row in rows:]]
+<!-- What i had before with no Vue.js
+<span class="tag is-link is-normal"><b>John Smith</b></span>
+<br>
+<div><b>Teacher:</b> [[=row.reviews.teacher]]</div>
+<div><b>Rating:</b> [[=row.reviews.rating]]/5</div>
+<div><b>Review: </b>[[=row.reviews.review]]</div>
+<span class="icon is-small has-text-success">
+    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+    <span>0</span>
+</span>
+<span class="icon is-small has-text-danger">
+    <i class="fa fa-thumbs-down" aria-hidden="true" style="padding-left: 20px;"></i>
+    <span>0</span>
+</span>
+-->
+
+[[pass]]
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+  let get_reviews_url = "[[=XML(get_reviews_url)]]";
+  let add_review_url = "[[=XML(add_review_url)]]";
+  let delete_review_url = "[[=XML(delete_review_url)]]";
+  let thumb_review_url = "[[=XML(thumb_review_url)]]";
+  let user_email = "[[=XML(user_email)]]";
+  let username = "[[=XML(username)]]";
+</script>
+<script src="js/index.js"></script>
+[[end]]
