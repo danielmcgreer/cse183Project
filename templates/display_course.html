@@ -2,7 +2,7 @@
 
 <div class="section">
 
-  <h1 class="title">Found Reviews</h1>
+  <h1 class="title">Course Reviews for [[=course_info.department]] [[=course_info.class_number]] [[=course_info.class_name]] </h1>
   
   <a class="button is-success" href="[[=URL('search_course')]]">
     <span>Search Another Course</span>
@@ -11,33 +11,24 @@
   <a class="button is-success" href="[[=URL('index')]]">
     <span>Back to Main Page</span>
   </a>
+  
+  <a class="button is-success" href="[[=URL('write_reviews', course_info.id)]]">
+	<span>Write a Review</span>
+  </a>
 
   <div class="container">
     <table class="table is-striped is-fullwidth">
       <tr>
-        <th>Course identifier</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Average rating</th>
-        <th></th>
+        <th>Teacher</th>
+        <th>Rating</th>
+        <th>Review</th>
         <th></th>
       </tr>
-      [[for match in allMatches:]]
+      [[for review in reviews:]]
       <tr>
-        <td>[[=match.department]] [[=match.class_number]]</td>
-        <td>[[=match.class_name]]</td>
-        <td>Description Will go here</td>
-        <td>Average rating will go here</td>
-        <td>
-          <a class="button" href="[[=URL('display_reviews', match.id)]]">
-            <span>Read Reviews</span>
-          </a>
-        </td>
-        <td>
-          <a class="button" href="[[=URL('write_reviews', match.id)]]">
-            <span>Write a Review</span>
-          </a>
-        </td>
+        <td>[[=review.teacher]]</td>
+        <td>[[=review.rating]]</td>
+        <td>[[=review.review]]</td>
       </tr>
 	  [[pass]]
 	  

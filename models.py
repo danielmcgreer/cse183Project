@@ -36,5 +36,7 @@ db.define_table(
 )
 
 db.reviews.created_by.readable = db.reviews.created_by.writable = False
+db.reviews.course_id.readable = db.reviews.course_id.writable = False
+db.reviews.id.readable = db.reviews.id.writable = False
 
 db.commit()

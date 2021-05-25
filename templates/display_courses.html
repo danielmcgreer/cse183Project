@@ -1,0 +1,49 @@
+[[extend 'layout.html']]
+
+<div class="section">
+
+  <h1 class="title">Found Courses</h1>
+  
+  <a class="button is-success" href="[[=URL('search_course')]]">
+    <span>Search Another Course</span>
+  </a>
+  
+  <a class="button is-success" href="[[=URL('index')]]">
+    <span>Back to Main Page</span>
+  </a>
+
+  <div class="container">
+    <table class="table is-striped is-fullwidth">
+      <tr>
+        <th>Course identifier</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Average rating</th>
+        <th></th>
+        <th></th>
+      </tr>
+      [[for match in allMatches:]]
+      <tr>
+        <td>[[=match.department]] [[=match.class_number]]</td>
+        <td>[[=match.class_name]]</td>
+        <td>Description Will go here</td>
+        <td>Average rating will go here</td>
+        <td>
+          <a class="button" href="[[=URL('display_reviews', match.id)]]">
+            <span>Read Reviews</span>
+          </a>
+        </td>
+        <td>
+          <a class="button" href="[[=URL('write_reviews', match.id)]]">
+            <span>Write a Review</span>
+          </a>
+        </td>
+      </tr>
+	  [[pass]]
+	  
+    </table>
+  </div>
+
+
+
+</div>

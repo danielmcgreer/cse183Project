@@ -114,9 +114,9 @@ def search_course():
         
     return dict(form=form)
   
-@action('display_course/<major_id>/<course_num:int>')
-@action.uses(db, auth, 'display_course.html')
-def display_course(major_id=None, course_num=None):
+@action('display_courses/<major_id>/<course_num:int>')
+@action.uses(db, auth, 'display_courses.html')
+def display_courses(major_id=None, course_num=None):
 #TODO if args eq none then do something
     if(course_num==None):
         course_num=0
@@ -129,6 +129,22 @@ def display_course(major_id=None, course_num=None):
                         
     allMatches = perfectMatches+closeMatches1+closeMatches2
     return dict(allMatches=allMatches, url_signer=url_signer) 
+  
+  
+@action('display_course/<major_id>/<course_num:int>')
+@action.uses(db, auth, 'display_course.html')
+def display_course(major_id=None, course_num=None):
+#TODO if args eq none then do something
+    if(course_num==None):
+        course_num=0
+        
+    #grab matching course
+    course_info = db((db.courses.department == major_id) & (db.courses.class_number == course_num)).select().first()
+    
+    #grab all reviews with that course
+    reviews = db((db.reviews.course_id == course_info.id)).select()
+
+    return dict(course_info=course_info, reviews=reviews, url_signer=url_signer) 
   
   
 @action('users_reviews')
