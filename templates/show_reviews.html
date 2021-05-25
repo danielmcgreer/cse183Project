@@ -31,17 +31,17 @@
               <div v-if="new_post_showing" class= "is-fullwidth">
                 <div class="field">
                     <label for="review" style="font-size: 20px;"><b>Write Review</b></label> 
-                    <textarea v-model="post_text" class="textarea is-primary" placeholder="Enter new post here"></textarea>
+                    <textarea v-model="post_text" class="textarea is-primary" placeholder="Enter new post here" required></textarea>
                 </div>
                 <div class="field">
                     <label for="teacher" style="font-size: 15px;"><b>Teacher</b></label> 
                     <br>
-                    <input v-model="post_teacher" class="input is-normal is-primary" placeholder="Enter professor name">
+                    <input v-model="post_teacher" class="input is-normal is-primary" placeholder="Enter professor name" required>
                 </div>
                 <label for="rating" style="font-size: 15px;"><b>Rate The Class</b></label> 
                 <br>
                 <div class="select is-primary">
-                    <select v-model="post_rating">
+                    <select v-model="post_rating" required>
                       <option disabled value="">Please select one</option>
                       <option value="1">One Star</option>
                       <option value="2">Two Star</option>

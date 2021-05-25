@@ -46,9 +46,9 @@ db.define_table(
     # Field('post_id', 'reference_post'),
     Field('review_id', 'reference reviews'),
     Field('user_email', default=get_user_email),
-    Field('post_text', 'text'),
-    Field('post_teacher', 'text'),
-    Field('post_rating', 'integer', requires=IS_INT_IN_RANGE(0, 5)),
+    Field('post_text', 'text', requires=IS_NOT_EMPTY()),
+    Field('post_teacher', 'text', requires=IS_NOT_EMPTY()),
+    Field('post_rating', 'integer', requires=IS_NOT_EMPTY()),
     Field('created_date', 'datetime', default=get_time),
 )
 
