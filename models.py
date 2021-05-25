@@ -18,7 +18,7 @@ db.define_table(
     Field('department', requires=IS_NOT_EMPTY()),
     Field('class_number',  'integer', requires=IS_NOT_EMPTY()),
     Field('class_name', requires=IS_NOT_EMPTY()),
-    Field('class_description'),
+    Field('class_description', 'text', requires=IS_NOT_EMPTY()),
 ) 
 
 #TODO make a class reference to a different table instead

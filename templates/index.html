@@ -7,10 +7,12 @@
 </style>
 
 <div class="section">
+    
+<div class="is-size-1" style="display: flex; justify-content: center;">UCSC CourseRater</div>
 
 <div class="section" id="vue-target" v-cloak>
-  <div class="control block">
-    <i class="fa fa-search" aria-hidden="true"></i>
+  <div class="control block" style="display: flex;">
+    <i class="fa fa-search icon is-medium" style="margin-top: 10px;" aria-hidden="true"></i>
     <input placeholder="search for a class using keywords..." class="input" type="text" v-model="query" @keyup="search" />
   </div>
 
@@ -20,24 +22,28 @@
 	</span>
 </div>
 
-  <h1 class="title">Browse Reviews</h2>
-
+  <h2 class="title" style="display: flex; justify-content: center;">Browse Reviews</h2>
+    
+  <!--
   <a class="button is-success" href="[[=URL('add_review')]]">
     <span class="icon"><i class="fa fa-plus"></i></span>
     <span>Add A Review!</span>
   </a>
+  -->
   
   <a class="button is-success" href="[[=URL('search_course')]]">
     <span>Search Course by ID</span>
   </a>
+  
+  <br>
 
   <div class="container">
     <table class="table is-striped is-fullwidth">
       <tr>
-        <th>Major</th>
+        <th>Department</th>
         <th>Number</th>
-        <th>Name</th>
-        <th>teacher</th>
+        <th>Class Name</th>
+        <th>Teacher</th>
         <th>Rating</th>
         <th>Review</th>
         <th></th>
