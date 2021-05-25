@@ -41,10 +41,10 @@ let init = (app) => {
  
     };
 
-    app.send_thumb = (post_id, rating) => {
+    app.send_thumb = (post_id, thumb_rating) => {
         axios.post(thumb_post_url, {
             post_id,
-            rating,
+            thumb_rating,
         }).then((result) => {
             let post = app.format_thumbs(result.data.post);
             let index = app.vue.posts.findIndex((post) => post.id === post_id);
@@ -80,21 +80,21 @@ let init = (app) => {
                 name: thumb.name, 
                 user_email: thumb.user_email,
             };
-            if (thumb.rating === 1) {
+            if (thumb.thumb_rating === 1) {
                 post.likes.push(info);
-            } else if (thumb.rating === -1) {
+            } else if (thumb.thumb_rating === -1) {
                 post.dislikes.push(info); 
             }
         });
         return post;
     };
 
-    app.user_thumb_on_post = (post, rating) => {
-        if(rating === 0) {
+    app.user_thumb_on_post = (post, thumb_rating) => {
+        if(thumb_rating === 0) {
             return false;
         } else {
             let arr;
-            if (rating === 1) {
+            if (thumb_rating === 1) {
                 arr = post.likes;
             } else {
                 arr = post.dislikes;

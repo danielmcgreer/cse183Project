@@ -8,18 +8,20 @@
 
 <div class="section" id="vue-target" v-cloak>
     <div class="section">
-      <h1 class="title">
+        <h1 class="title">
           [[=department]] [[=class_number]]: [[=class_name]]
-      </h1>
-      <div class="box">
+        </h1>
+        <br><br>
+        <div class="box">
           <h3 class="title">
                 Course Description
           </h3>
           <div>
               dummy text right now to put here. Class is about making a web page.
           </div>
-      </div>
-    
+        </div>
+        <br><br>
+        
     <div class="reviews">
         <h2 class="title">
             [[=department]] [[=class_number]] Reviews 
@@ -28,13 +30,18 @@
             <div class="">
               <div v-if="new_post_showing" class= "is-fullwidth">
                 <div class="field">
-                  <textarea v-model="post_text" class="textarea is-fullwidth" placeholder="Enter new post here"></textarea>
+                    <label for="review" style="font-size: 20px;"><b>Write Review</b></label> 
+                    <textarea v-model="post_text" class="textarea is-primary" placeholder="Enter new post here"></textarea>
                 </div>
                 <div class="field">
-                  <input v-model="post_teacher" placeholder="Enter professor name">
+                    <label for="teacher" style="font-size: 15px;"><b>Teacher</b></label> 
+                    <br>
+                    <input v-model="post_teacher" class="input is-normal is-primary" placeholder="Enter professor name">
                 </div>
-                <div class="field">
-                   <select v-model="post_rating">
+                <label for="rating" style="font-size: 15px;"><b>Rate The Class</b></label> 
+                <br>
+                <div class="select is-primary">
+                    <select v-model="post_rating">
                       <option disabled value="">Please select one</option>
                       <option value="1">One Star</option>
                       <option value="2">Two Star</option>
@@ -43,73 +50,81 @@
                       <option value="5">Five Star</option>
                     </select>
                 </div>
-                <button @click="send_post(); clear_new_post(); toggle_new_post()" class="button is-primary is-size-6">Post</button>
+                <br><br><br><br>
+                <button @click="send_post(); clear_new_post(); toggle_new_post()" class="button is-primary is-size-6">Post Review</button>
                 <button @click="clear_new_post(); toggle_new_post()" class="button is-warning is-size-6">Cancel</button>
               </div>
               <div v-if="!new_post_showing">
                 <button @click="toggle_new_post()" class="button is-primary is-size-6">
-                  <i class="fa fa-plus fa-fw"></i>
+                  <i style="width: 90%; padding-right: 10px; font-weight: bold;">Write a Review</i>
                 </button>
               </div>
             </div>
         </section>
                 
         <section class="section">
-            <div class="tile is-ancestor"></div>
+            <div class="is-ancestor"></div>
               <div class="tile is-vertical">
                 <div v-for="post in posts" class="tile is-child notification is-light">
-                  <div class="">
+                  <div class="box">
                     <div>{{post.post_text}}</div>
-                    <div>{{post.post_teacher}}</div>
-                    <div>{{post.post_rating}}</div>
+                    <br><br>
+                    <div><b>Teacher:</b> {{post.post_teacher}}</div>
+                    <div><b>Star Rating:</b> {{post.post_rating}}</div>
+                    <br>
                     <div class="is-size-6 has-text-grey">{{post.author}}</div>
-                  </div>
-                  <div class="">
-                    <div class="thumbs is-size-4">
-                      <span style="cursor: pointer" @click="delete_post(post.id)" v-if="post.user_email === user_email" class="has-text-danger is-pulled-right">
-                        <i class="fa fa-trash fa-fw"></i>
-                      </span>
-                      <span class="has-text-info" @mouseenter="toggle_hover_post(post.id)" @mouseleave="toggle_hover_post(0)">
-                        <span>
-                          <i @click="send_thumb(post.id, 0)" v-if="user_thumb_on_post(post, 1)" class="fa fa-flip-horizontal fa-thumbs-up" style="cursor: pointer"></i>
-                          <i @click="send_thumb(post.id, 1)" v-if="!user_thumb_on_post(post, 1)" class="fa fa-flip-horizontal fa-thumbs-o-up" style="cursor: pointer"></i>
-                        </span>
-                        <span>
-                          <i @click="send_thumb(post.id, 0)" v-if="user_thumb_on_post(post, -1)" class="fa fa-thumbs-down" style="cursor: pointer"></i>
-                          <i @click="send_thumb(post.id, -1)" v-if="!user_thumb_on_post(post, -1)" class="fa fa-thumbs-o-down" style="cursor: pointer"></i>
-                        </span>
-                      </span>
-                      <span v-if="hover_post === post.id" class="has-text-info">
-                        <span v-if="post.likes.length > 0"  class="is-size-7">
-                          Liked by
-                          <span v-for="like in post.likes">
-                            {{like.name}}
+                      <div class="">
+                        <div class="thumbs is-size-4">
+                          <span style="cursor: pointer" @click="delete_post(post.id)" v-if="post.user_email === user_email" class="has-text-danger is-pulled-right">
+                            <i class="fa fa-trash fa-fw"></i>
                           </span>
-                        </span>
-                        <span v-if="post.dislikes.length > 0" class="is-size-7">
-                          Disliked by 
-                          <span v-for="dislike in post.dislikes">
-                            {{dislike.name}}
+                          <span class="has-text-info" @mouseenter="toggle_hover_post(post.id)" @mouseleave="toggle_hover_post(0)">
+                            <span>
+                              <i @click="send_thumb(post.id, 0)" v-if="user_thumb_on_post(post, 1)" class="fa fa-flip-horizontal fa-thumbs-up" style="cursor: pointer"></i>
+                              <i @click="send_thumb(post.id, 1)" v-if="!user_thumb_on_post(post, 1)" class="fa fa-flip-horizontal fa-thumbs-o-up" style="cursor: pointer"></i>
+                            </span>
+                            <span>
+                              <i @click="send_thumb(post.id, 0)" v-if="user_thumb_on_post(post, -1)" class="fa fa-thumbs-down" style="cursor: pointer"></i>
+                              <i @click="send_thumb(post.id, -1)" v-if="!user_thumb_on_post(post, -1)" class="fa fa-thumbs-o-down" style="cursor: pointer"></i>
+                            </span>
                           </span>
-                        </span>
-                      </span>
-                    </div>
-                  </div>
+                          <span v-if="hover_post === post.id" class="has-text-info">
+                            <span v-if="post.likes.length > 0"  class="is-size-7">
+                              Liked by
+                              <span v-for="like in post.likes">
+                                {{like.name}}
+                              </span>
+                            </span>
+                            <span v-if="post.dislikes.length > 0" class="is-size-7">
+                              Disliked by 
+                              <span v-for="dislike in post.dislikes">
+                                {{dislike.name}}
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    <div>
+                </div>
+                </div>
                 </div>
             </div>
         </section>
+        
+        <!-- Navigation Buttons --> 
+        <a class="button is-primary" href="[[=URL('search_course')]]">
+            <span>Search Another Course</span>
+        </a>
+        <a class="button is-primary" href="[[=URL('index')]]">
+            <span>Back</span>
+        </a>
+        
         </div>
     </div>
 </div>
 
 
-<!-- Navigation Buttons --> 
-<a class="button is-primary" href="[[=URL('search_course')]]">
-    <span>Search Another Course</span>
-</a>
-<a class="button is-primary" href="[[=URL('index')]]">
-    <span>Back</span>
-</a>
+
  
 [[for row in rows:]]
 <!-- What i had before with no Vue.js
