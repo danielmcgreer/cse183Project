@@ -166,9 +166,31 @@ def display_course(major_id=None, course_num=None):
     #grab all reviews with that course
     reviews = db((db.reviews.course_id == course_info.id)).select()
 
-    return dict(course_info=course_info, reviews=reviews, url_signer=url_signer) 
+    return dict(get_reviews_url = URL('get_reviews'),
+                submit_review_url = URL('submit_review'),
+                delete_reviews_url = URL('delete_review', signer=url_signer),
+                course_info=course_info, course_id=course_info.id, reviews=reviews, url_signer=url_signer) 
+
+
+@action('submit_review/<course_id:int>', method="POST")
+@action.uses(auth, db)
+def submit_review(course_id):
+    db.reviews.insert(
+        course_id=course_id,
+        teacher=request.json.get('teacher'),
+        rating = request.json.get('rating'),
+        review=request.json.get('review'),
+    )
+    return dict()
+    
   
-  
+@action('get_reviews/<course_id:int>')
+@action.uses(db) 
+def get_reviews(course_id):
+    the_reviews = db(db.reviews.course_id == course_id).select().as_list()
+    return dict(the_reviews=the_reviews) 
+
+ 
 @action('users_reviews')
 @action.uses(db, auth, 'users_reviews.html')
 def users_reviews():
@@ -229,3 +251,5 @@ def write_review(course_id):
                          course_id = course.id)
         redirect(URL('index'))
     return dict(form=form)
+    
+    

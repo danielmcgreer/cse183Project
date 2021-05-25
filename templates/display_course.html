@@ -1,6 +1,12 @@
 [[extend 'layout.html']]
 
-<div class="section">
+<style>
+[v-cloak] {
+     display: none;
+}
+</style>
+
+<div class="section" id="vue-target" v-cloak>
 
   <h1 class="title">Course Reviews for [[=course_info.department]] [[=course_info.class_number]] [[=course_info.class_name]] </h1>
   
@@ -12,29 +18,65 @@
     <span>Back to Main Page</span>
   </a>
   
-  <a class="button is-success" href="[[=URL('write_review', course_info.id)]]">
+  <a class="button is-success" @click="set_add_status(true)">
 	<span>Write a Review</span>
   </a>
-
-  <div class="container">
+  
+	<div v-if="adding_new_review" class="field">
+	<div class="form">
+	<div class="field">
+	  <p class="control">
+		<textarea class="text" placeholder="e.g. Hello world!" rows="3" v-model="new_teacher"></textarea>
+	  </p>
+	</div>
+	<div class="field">
+	   <select v-model="new_rating">
+		  <option disabled value="">Please select one</option>
+		  <option value="1">One Star</option>
+		  <option value="2">Two Star</option>
+		  <option value="3">Three Star</option>
+		  <option value="4">Four Star</option>
+		  <option value="5">Five Star</option>
+		</select>
+	</div>
+	<div class="field">
+	  <p class="control">
+		<textarea class="textarea" placeholder="e.g. Hello world!" rows="3" v-model="new_review"></textarea>
+	  </p>
+	</div>
+	  <button class="button is-primary" @click="submit_review" >Submit Review</button>
+	  <button class="button is-warning" @click="set_add_status(false)" >Cancel</button>
+	</div>
+	</div>
+	
+	
+  <div id="reviews_list" class="container">
     <table class="table is-striped is-fullwidth">
       <tr>
         <th>Teacher</th>
         <th>Rating</th>
         <th>Review</th>
-        <th></th>
       </tr>
-      [[for review in reviews:]]
-      <tr>
-        <td>[[=review.teacher]]</td>
-        <td>[[=review.rating]]</td>
-        <td>[[=review.review]]</td>
+      <tr v-for="r in reviews_list.slice().reverse()">
+        <td>{{r.teacher}}</td>
+        <td>{{r.rating}}</td>
+        <td>{{r.review}}</td>
       </tr>
 	  [[pass]]
 	  
     </table>
   </div>
-
-
-
 </div>
+	
+	
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+    let get_reviews_url = "[[=XML(get_reviews_url)]]";
+    let submit_review_url = "[[=XML(submit_review_url)]]";
+    let delete_reviews_url = "[[=XML(delete_reviews_url)]]";
+	let course_id = "[[=course_id]]";
+</script>
+<script src="js/display_course.js"></script>
+[[end]]
