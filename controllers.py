@@ -174,3 +174,36 @@ def search():
 
     return dict(results=results)
 
+
+@action('write_review/<course_id>', method=["GET", "POST"])
+@action.uses(db, session, auth.user, 'add_review.html')
+def write_review(course_id):
+    #Create a form for all fields for now
+    form = Form([Field('teacher',),
+                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
+                Field('review', 'text')],
+                csrf_session=session, formstyle=FormStyleBulma)
+                
+    course_info = db(db.courses.id == course_id).select().first()
+    
+    # if form is accepted
+    if form.accepted:
+        # Check if there is a course that already exists with the entered info
+        if db((db.courses.department == course_info.department) &
+              (db.courses.class_number == course_info.class_number) &
+              (db.courses.class_name == course_info.class_name)).select().first() == None:
+              # If there is no course with the inputted info then create the course by inserting its info into the courses table
+              db.courses.insert(department = course_info.department,
+                                class_number = course_info.class_number,
+                                class_name = course_info.class_name)
+        # Grab the course that matches the filled fileds (its Id is needed)
+        course = db((db.courses.department == course_info.department) &
+              (db.courses.class_number == course_info.class_number) &
+              (db.courses.class_name == course_info.class_name)).select().first()
+        # insert the review into the reviews table
+        db.reviews.insert(teacher = form.vars["teacher"],
+                         rating = form.vars["rating"],
+                         review = form.vars["review"], 
+                         course_id = course.id)
+        redirect(URL('index'))
+    return dict(form=form)
