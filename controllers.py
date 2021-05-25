@@ -138,22 +138,22 @@ def get_name(email):
     name = user.first_name + " " + user.last_name if user is not None else "Unknown"
     return name
 
-def get_review_author(review_id):
-    review = db.review[review_id]
-    name = get_name(reviews.created_by)
+def get_post_author(post_id):
+    post = db.post[post_id]
+    name = get_name(post.user_email)
     return name
 
-def get_thumbs(review_id):
-    thumbs = db(db.thumb.review_id == review_id).select().as_list()
+def get_thumbs(post_id):
+    thumbs = db(db.thumb.post_id == post_id).select().as_list()
     for thumb in thumbs:
-        thumb["name"] = get_name(thumb["created_by"])
+        thumb["name"] = get_name(thumb["user_email"])
     return thumbs
   
-def review_format(review_id):
-    review = db.reviews[review_id].as_dict()
-    review["author"] = get_review_author(review_id) 
-    review["thumbs"] = get_thumbs(review_id)
-    return review
+def post_format(post_id):
+    post = db.post[post_id].as_dict()
+    post["author"] = get_post_author(post_id) 
+    post["thumbs"] = get_thumbs(post_id)
+    return post
 
 @action('show_reviews/<major_id>/<course_num:int>/<course_id>')
 @action.uses(db, auth.user, db, session, url_signer, 'show_reviews.html')
@@ -174,59 +174,61 @@ def show_reviews(major_id=None, course_num=None, course_id=None):
         class_number=class_number, 
         class_name=class_name, 
         url_signer=url_signer,
-        get_reviews_url = URL('get_reviews', signer=url_signer),
-        add_review_url = URL('add_review_text', signer=url_signer),
-        delete_review_url = URL('delete_review', signer=url_signer),
-        thumb_review_url = URL('thumb_review', signer=url_signer),
+        get_posts_url = URL('get_posts', signer=url_signer),
+        add_post_url = URL('add_post', signer=url_signer),
+        delete_post_url = URL('delete_post', signer=url_signer),
+        thumb_post_url = URL('thumb_post', signer=url_signer),
         user_email = get_user_email(),
         username = auth.current_user.get('first_name') + " " + auth.current_user.get("last_name")
     ) 
 
-@action('get_reviews')
+@action('get_posts')
 @action.uses(url_signer.verify(), auth.user, db) 
-def get_reviews(major_id=None, course_id=None, review_id=None):
-    reviews = db().select(db.reviews.course_id == course_id, orderby=~db.review.created_date).as_list() 
-    print(reviews)
-    formatted_reviews = []
-    for review in reviews:
-        formatted_reviews.append(review_format(review["id"]))
-    return dict(reviews=formatted_reviews) 
+def get_posts():
+    posts = db().select(db.post.ALL, orderby=~db.post.created_date).as_list() 
+    formatted_posts = []
+    for post in posts:
+        formatted_posts.append(post_format(post["id"]))
+    return dict(posts=formatted_posts) 
 
-@action('add_review_text', method=["GET", "POST"])
+# Add Vue field input variables here as well
+@action('add_post', method=["GET", "POST"])
 @action.uses(url_signer.verify(), auth.user, db)
-def add_review_text():
-    review_text = request.json.get('review') 
-    new_id = db.reviews.insert(review_text=review_text) 
-    review = db.reviews[new_id]
-    review = review_format(reviews.id)
-    return dict(review=review) 
+def add_post():
+    post_text = request.json.get('post_text') 
+    post_teacher = request.json.get('post_teacher')
+    post_rating = request.json.get('post_rating')
+    new_id = db.post.insert(post_text=post_text, post_teacher=post_teacher, post_rating=post_rating) 
+    post = db.post[new_id]
+    post = post_format(post.id)
+    return dict(post=post) 
 
-@action('delete_review', method=["GET", "POST"])
+@action('delete_post', method=["GET", "POST"])
 @action.uses(url_signer.verify(), auth.user, db)
-def delete_review():
-    review_id = request.json.get('review_id') 
-    if review_id is not None:
-        db(db.reviews.id == review_id).delete()
+def delete_post():
+    post_id = request.json.get('post_id') 
+    if post_id is not None:
+        db(db.post.id == post_id).delete()
     return dict()
 
-@action('thumb_review', method=["GET", "POST"])
+@action('thumb_post', method=["GET", "POST"])
 @action.uses(url_signer.verify(), auth.user, db)
-def thumb_review():
-    review_id = request.json.get('review_id') 
+def thumb_post():
+    post_id = request.json.get('post_id') 
     rating = request.json.get('thumb_rating') 
     user_email = auth.current_user.get('email')
 
 
     db.thumb.update_or_insert(
-        (db.thumb.review_id == review_id) & (db.thumb.user_email == user_email),
+        (db.thumb.post_id == post_id) & (db.thumb.user_email == user_email),
         rating=rating,
-        review_id=review_id,
+        post_id=post_id,
         user_email=user_email
     )
 
-    # return review with thumbs filled in 
-    review = review_format(review_id)
-    return dict(review=review)
+    # return post with thumbs filled in 
+    post = post_format(post_id)
+    return dict(post=post)
 ############################################################################################################
   
 @action('users_reviews')

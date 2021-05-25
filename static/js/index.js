@@ -10,106 +10,112 @@ let init = (app) => {
     // This is the Vue data.
     app.data = {
         user_email: user_email,
-        reviews: [], 
-        review_text: '', 
-        new_review_showing: false, 
+        posts: [],
+        post_teacher: '',
+        post_rating: '',
+        post_text: '', 
+        new_post_showing: false, 
         refresh: false,
-        hover_review: null,
+        hover_post: null,
     };
 
     app.refresh = () => {
-        let temp = app.vue.hover_review;
-        app.vue.hover_review = null;
-        app.vue.hover_review = temp;
+        let temp = app.vue.hover_post;
+        app.vue.hover_post = null;
+        app.vue.hover_post = temp;
     };
 
-    app.toggle_hover_review = (review_id) => {
-        app.vue.hover_review = review_id;
+    app.toggle_hover_post = (post_id) => {
+        app.vue.hover_post = post_id;
     };
 
-    app.send_review = () => { 
-        axios.review(add_review_url, {review_text : app.vue.review_text}).then((result) => {
-            let review = app.format_thumbs(result.data.review); 
-            app.vue.reviews = app.reindex([review, ...app.vue.reviews]);
-            app.clear_new_review();
+    app.send_post = () => { 
+        axios.post(add_post_url, {post_text : app.vue.post_text, 
+                                    post_teacher : app.vue.post_teacher, 
+                                    post_rating : app.vue.post_rating}).then((result) => {
+            let post = app.format_thumbs(result.data.post); 
+            app.vue.posts = app.reindex([post, ...app.vue.posts]);
+            app.clear_new_post();
         })
-        .catch((e) => alert("Error Sending New review:", e));
+        .catch((e) => alert("Error Sending New Post:", e));
  
     };
 
-    app.send_thumb = (review_id, thumb_rating) => {
-        axios.review(thumb_review_url, {
-            review_id,
-            thumb_rating,
+    app.send_thumb = (post_id, rating) => {
+        axios.post(thumb_post_url, {
+            post_id,
+            rating,
         }).then((result) => {
-            let review = app.format_thumbs(result.data.review);
-            let index = app.vue.reviews.findIndex((review) => review.id === review_id);
-            app.vue.reviews[index] = review;
-            app.vue.reviews = app.reindex(app.vue.reviews);
+            let post = app.format_thumbs(result.data.post);
+            let index = app.vue.posts.findIndex((post) => post.id === post_id);
+            app.vue.posts[index] = post;
+            app.vue.posts = app.reindex(app.vue.posts);
             app.refresh();
         });
     };
 
-    app.get_reviews = () => {
-        axios.get(get_reviews_url).then((result) => {
-            let reviews = result.data.reviews.map((review) => app.format_thumbs(review)); // map returns new array
-            app.vue.reviews = app.reindex(reviews);
+    app.get_posts = () => {
+        axios.get(get_posts_url).then((result) => {
+            let posts = result.data.posts.map((post) => app.format_thumbs(post)); // map returns new array
+            app.vue.posts = app.reindex(posts);
         })
-        .catch((e) => alert("Error Getting review:", e));
+        .catch((e) => alert("Error Getting Post:", e));
 
     };
 
-    app.delete_review = (review_id) => {
-        axios.review(delete_review_url, {
-            review_id,
+    app.delete_post = (post_id) => {
+        axios.post(delete_post_url, {
+            post_id,
         }).then(() => {
-            app.vue.reviews = app.vue.reviews.filter((review) => review.id !== review_id);
+            app.vue.posts = app.vue.posts.filter((post) => post.id !== post_id);
         });
     };
 
-    // happens only in get_reviews or send_review (a new one)
-    app.format_thumbs = (review) => {
-        review.likes = [];
-        review.dislikes = [];
-        review.thumbs.forEach((thumb) => {
+    // happens only in get_posts or send_post (a new one)
+    app.format_thumbs = (post) => {
+        post.likes = [];
+        post.dislikes = [];
+        post.thumbs.forEach((thumb) => {
             let info = {
                 name: thumb.name, 
                 user_email: thumb.user_email,
             };
-            if (thumb.thumb_rating === 1) {
-                review.likes.push(info);
-            } else if (thumb.thumb_rating === -1) {
-                review.dislikes.push(info); 
+            if (thumb.rating === 1) {
+                post.likes.push(info);
+            } else if (thumb.rating === -1) {
+                post.dislikes.push(info); 
             }
         });
-        return review;
+        return post;
     };
 
-    app.user_thumb_on_review = (review, thumb_rating) => {
-        if(thumb_rating === 0) {
+    app.user_thumb_on_post = (post, rating) => {
+        if(rating === 0) {
             return false;
         } else {
             let arr;
-            if (thumb_rating === 1) {
-                arr = review.likes;
+            if (rating === 1) {
+                arr = post.likes;
             } else {
-                arr = review.dislikes;
+                arr = post.dislikes;
             }
             let index = arr.findIndex((user) => user.user_email === user_email);
             return index !== -1; 
         }
     };
 
-    app.toggle_new_review = () => { 
-        app.vue.new_review_showing = !app.vue.new_review_showing;
+    app.toggle_new_post = () => { 
+        app.vue.new_post_showing = !app.vue.new_post_showing;
     };
 
-    app.clear_new_review = () => { 
-        app.vue.review_text = "";
+    app.clear_new_post = () => { 
+        app.vue.post_text = "";
+        app.vue.post_teacher = "";
+        app.vue.post_rating = "";
     };
 
 
-    // Use this function to reindex the reviews, when you get them, and when
+    // Use this function to reindex the posts, when you get them, and when
     // you add / delete one of them.
     app.reindex = (a) => {
         let idx = 0;
@@ -122,14 +128,14 @@ let init = (app) => {
     // dictionary of all methods
     app.methods = {
         // API methods
-        send_review: app.send_review, 
+        send_post: app.send_post, 
         send_thumb: app.send_thumb,
-        delete_review: app.delete_review,
+        delete_post: app.delete_post,
         // other methods
-        toggle_new_review: app.toggle_new_review,
-        toggle_hover_review: app.toggle_hover_review,
-        clear_new_review: app.clear_new_review,
-        user_thumb_on_review: app.user_thumb_on_review,
+        toggle_new_post: app.toggle_new_post,
+        toggle_hover_post: app.toggle_hover_post,
+        clear_new_post: app.clear_new_post,
+        user_thumb_on_post: app.user_thumb_on_post,
     };
 
     // This creates the Vue instance.
@@ -141,7 +147,7 @@ let init = (app) => {
 
     // And this initializes it.
     app.init = () => {
-        app.get_reviews();
+        app.get_posts();
 
     };
 

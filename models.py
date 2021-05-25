@@ -30,25 +30,32 @@ db.define_table(
     Field('course_id', 'reference_courses'),
     Field('created_by', default=get_user_email),
     Field('teacher',),
-    Field('review_id', 'reference reviews'),
     Field('rating', 'integer', requires=IS_INT_IN_RANGE(0, 5)),
+    Field('review_id', 'reference reviews'),
     Field('review', 'text'),
-    Field('created_date', 'datetime', default=get_time),
+    #Field('created_date', 'datetime', default=get_time),
+    #Field('post_id', 'reference_reviews'),
+    #Field('user_email', default=get_user_email),
+    #Field('post_text', 'text'),
+    #Field('created_date', 'datetime', default=get_time),
 
 )
 
 db.define_table(
     'post',
-    Field('post_id', 'reference_post'),
+    # Field('post_id', 'reference_post'),
+    Field('review_id', 'reference reviews'),
     Field('user_email', default=get_user_email),
     Field('post_text', 'text'),
+    Field('post_teacher', 'text'),
+    Field('post_rating', 'integer', requires=IS_INT_IN_RANGE(0, 5)),
     Field('created_date', 'datetime', default=get_time),
 )
 
 db.define_table(
     'thumb',
     Field('user_email', default=get_user_email()),
-    Field('review_id', 'reference reviews'),
+    # Field('review_id', 'reference reviews'),
     Field('post_id', 'reference post'),
     Field('thumb_rating', 'integer', default=0)
 )
