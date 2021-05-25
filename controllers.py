@@ -44,7 +44,7 @@ url_signer = URLSigner(session)
 def index():
     #Grabs reviews and associated courses
     reviews = db(db.reviews.course_id == db.courses.id).select()
-    return dict(reviews=reviews, url_signer=url_signer)
+    return dict(search_url=URL('search', signer=url_signer), reviews=reviews, url_signer=url_signer)
     
     
 @action('add_review', method=["GET", "POST"])
@@ -138,3 +138,23 @@ def users_reviews():
     rows = db((db.reviews.created_by == get_user_email()) &
                 (db.courses.id == db.reviews.course_id)).select()
     return dict(rows=rows, url_signer=url_signer) 
+    
+@action('search')
+@action.uses()
+def search():
+    q = request.params.get("q")
+    query = q +"%"
+
+    numbers = []
+
+    for word in q.split():
+        if word.isdigit():
+            numbers.append(int(word))
+    # TODO: do something with numbers so you can have a better search system
+
+    results = db((db.courses.class_name.like(query)) |
+                 (db.courses.department.like(query)) |
+                 (db.courses.class_number.like(query))).select().as_list()
+
+    return dict(results=results)
+

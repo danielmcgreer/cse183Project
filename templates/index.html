@@ -1,16 +1,34 @@
 [[extend 'layout.html']]
 
+<style>
+[v-cloak] {
+     display: none;
+}
+</style>
+
 <div class="section">
 
-  <h1 class="title">All Reviews</h1>
+<div class="section" id="vue-target" v-cloak>
+  <div class="control block">
+    <i class="fa fa-search" aria-hidden="true"></i>
+    <input placeholder="search for a class using keywords..." class="input" type="text" v-model="query" @keyup="search" />
+  </div>
+
+<span v-for="r in results">
+     <a v-bind:href="r.link_display_course">{{r.department}} {{r.class_number}} {{r.class_name}}</a>
+	 <br>
+	</span>
+</div>
+
+  <h1 class="title">Browse Reviews</h2>
 
   <a class="button is-success" href="[[=URL('add_review')]]">
     <span class="icon"><i class="fa fa-plus"></i></span>
-    <span>Add Review</span>
+    <span>Add A Review!</span>
   </a>
   
   <a class="button is-success" href="[[=URL('search_course')]]">
-    <span>Search course</span>
+    <span>Search Course by ID</span>
   </a>
 
   <div class="container">
@@ -38,7 +56,13 @@
       [[pass]]
     </table>
   </div>
-
-
-
 </div>
+
+
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+  let search_url = "[[=XML(search_url)]]";
+</script>
+<script src="js/index.js"></script>
+[[end]]
