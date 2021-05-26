@@ -61,21 +61,26 @@
         <td>{{r.teacher}}</td>
         <td>{{r.rating}}</td>
         <td>{{r.review}}</td>
+		<td>
+		<div v-if="r.created_by==current_user">
+			<p class="has-text-right has-text-danger is-size-4"><span class="icon"><i @click="delete_review(r._idx)" class="fa fa-fw fa-trash"></i></span></p>
+		</div>
+		</td>
       </tr>
 	  [[pass]]
-	  
+
     </table>
   </div>
 </div>
-	
-	
+
+
 
 [[block page_scripts]]
 <!-- Loads the index-specific js for Vue -->
 <script>
     let get_reviews_url = "[[=XML(get_reviews_url)]]";
     let submit_review_url = "[[=XML(submit_review_url)]]";
-    let delete_reviews_url = "[[=XML(delete_reviews_url)]]";
+    let delete_review_url = "[[=XML(delete_review_url)]]";
 	let course_id = "[[=course_id]]";
 </script>
 <script src="js/display_course.js"></script>

@@ -120,13 +120,14 @@ def edit(review_id=None):
         redirect(URL('index'))
     return dict(form=form)
     
-@action('delete_review/<review_id:int>')
-@action.uses(db, session, auth.user)
-def delete(review_id=None):
+@action('delete_review')
+@action.uses(url_signer.verify(), db, session, auth.user)
+def delete():
+    review_id = request.params.get('id')
     assert review_id is not None
     db(db.reviews.id == review_id).delete()
     redirect(URL('users_reviews'))
-    
+
 @action('search_course', method=["GET", "POST"])
 @action.uses(db, auth, 'search_course.html')
 def search_course():
@@ -136,43 +137,43 @@ def search_course():
     #TODO if it is not accepted
     if form.accepted:
         redirect(URL('display_courses',form.vars["department"] ,form.vars["class_number"] ))
-        
+
     return dict(form=form)
-  
+
 @action('display_courses/<major_id>/<course_num:int>')
 @action.uses(db, auth, 'display_courses.html')
 def display_courses(major_id=None, course_num=None):
 #TODO if args eq none then do something
     if(course_num==None):
         course_num=0
-    perfectMatches = db((db.courses.department == major_id) & 
+    perfectMatches = db((db.courses.department == major_id) &
                         (db.courses.class_number == course_num)).select()
-    closeMatches1 = db((db.courses.department == major_id) & 
-                        (db.courses.class_number != course_num)).select() 
-    closeMatches2 = db((db.courses.department != major_id) & 
+    closeMatches1 = db((db.courses.department == major_id) &
+                        (db.courses.class_number != course_num)).select()
+    closeMatches2 = db((db.courses.department != major_id) &
                         (db.courses.class_number == course_num)).select()
-                        
+
     allMatches = perfectMatches+closeMatches1+closeMatches2
-    return dict(allMatches=allMatches, url_signer=url_signer) 
-  
-  
+    return dict(allMatches=allMatches, url_signer=url_signer)
+
+
 @action('display_course/<major_id>/<course_num:int>')
 @action.uses(db, auth, 'display_course.html')
 def display_course(major_id=None, course_num=None):
 #TODO if args eq none then do something
     if(course_num==None):
         course_num=0
-        
+
     #grab matching course
     course_info = db((db.courses.department == major_id) & (db.courses.class_number == course_num)).select().first()
-    
+
     #grab all reviews with that course
     reviews = db((db.reviews.course_id == course_info.id)).select()
 
     return dict(get_reviews_url = URL('get_reviews'),
                 submit_review_url = URL('submit_review'),
-                delete_reviews_url = URL('delete_review', signer=url_signer),
-                course_info=course_info, course_id=course_info.id, reviews=reviews, url_signer=url_signer) 
+                delete_review_url = URL('delete_review', signer=url_signer),
+                course_info=course_info, course_id=course_info.id, reviews=reviews, url_signer=url_signer)
 
 
 @action('submit_review/<course_id:int>', method="POST")
@@ -184,14 +185,17 @@ def submit_review(course_id):
         rating = request.json.get('rating'),
         review=request.json.get('review'),
     )
-    return dict()
-    
-  
+    created_by=get_user_email()
+    return dict(created_by=created_by)
+
+
 @action('get_reviews/<course_id:int>')
-@action.uses(db) 
+@action.uses(db)
 def get_reviews(course_id):
+    name=get_user_email()
+    print(name)
     the_reviews = db(db.reviews.course_id == course_id).select().as_list()
-    return dict(the_reviews=the_reviews) 
+    return dict(the_reviews=the_reviews, name=name)
 
  
 @action('users_reviews')
