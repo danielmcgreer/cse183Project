@@ -91,6 +91,7 @@ let init = (app) => {
         set_stars: app.set_stars,
         stars_over: app.stars_over,
         stars_out: app.stars_out,
+
 		get_reviews: app.get_reviews,
 		set_add_status: app.set_add_status,
 		submit_review: app.submit_review,

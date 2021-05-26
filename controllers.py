@@ -186,14 +186,16 @@ def submit_review(course_id):
         review=request.json.get('review'),
     )
     created_by = get_user_email()
+
     return dict(created_by=created_by)
 
 
 @action('get_reviews/<course_id:int>')
 @action.uses(db)
 def get_reviews(course_id):
+    name=get_user_email()
+    print(name)
     the_reviews = db(db.reviews.course_id == course_id).select().as_list()
-    name = get_user_email()
     return dict(the_reviews=the_reviews, name=name)
 
  
