@@ -79,8 +79,10 @@ def add_review():
     form = Form([Field('department', requires=IS_NOT_EMPTY()),
                 Field('class_number',  'integer', requires=IS_NOT_EMPTY()),
                 Field('class_name', requires=IS_NOT_EMPTY()),
-                Field('teacher',),
-                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
+                Field('teacher', requires=IS_NOT_EMPTY()),
+                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
+                Field('workload', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
+                Field('diffuculty', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
                 Field('review', 'text')],
                 csrf_session=session, formstyle=FormStyleBulma)
 
@@ -101,6 +103,8 @@ def add_review():
         # insert the review into the reviews table
         db.reviews.insert(teacher = form.vars["teacher"],
                          rating = form.vars["rating"],
+                         workload = form.vars["workload"],
+                         difficulty = form.vars["difficulty"],
                          review = form.vars["review"],
                          course_id = course.id)
         redirect(URL('index'))
@@ -183,6 +187,8 @@ def submit_review(course_id):
         course_id=course_id,
         teacher=request.json.get('teacher'),
         rating = request.json.get('rating'),
+        workload = request.json.get('workload'),
+        difficulty = request.json.get('difficulty'),
         review=request.json.get('review'),
     )
     created_by = get_user_email()
@@ -194,7 +200,6 @@ def submit_review(course_id):
 @action.uses(db)
 def get_reviews(course_id):
     name=get_user_email()
-    print(name)
     the_reviews = db(db.reviews.course_id == course_id).select().as_list()
     return dict(the_reviews=the_reviews, name=name)
 
@@ -232,7 +237,9 @@ def search():
 def write_review(course_id):
     #Create a form for all fields for now
     form = Form([Field('teacher',),
-                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
+                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
+                Field('workload', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
+                Field('difficulty', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
                 Field('review', 'text')],
                 csrf_session=session, formstyle=FormStyleBulma)
                 
@@ -255,6 +262,8 @@ def write_review(course_id):
         # insert the review into the reviews table
         db.reviews.insert(teacher = form.vars["teacher"],
                          rating = form.vars["rating"],
+                         workload = form.vars["workload"],
+                         difficulty = form.vars["difficulty"],
                          review = form.vars["review"], 
                          course_id = course.id)
         redirect(URL('index'))

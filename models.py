@@ -29,8 +29,11 @@ db.define_table(
     'reviews',
     Field('course_id', 'reference_courses'),
     Field('created_by', default=get_user_email),
-    Field('teacher',),
-    Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
+    Field('teacher', requires=IS_NOT_EMPTY()),
+    Field('rating', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
+    Field('workload', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
+    Field('difficulty', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
+
     Field('review', 'text'),
 
 )

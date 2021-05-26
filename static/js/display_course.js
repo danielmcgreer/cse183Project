@@ -12,7 +12,9 @@ let init = (app) => {
         reviews_list: [],
 		adding_new_review: false,
 		new_teacher: "",
-		new_rating: 0,
+		new_rating: 1,
+		new_workload: 1,
+		new_difficulty: 1,
 		new_review: "",
 		author:"",
 		current_user:""
@@ -28,6 +30,8 @@ let init = (app) => {
             {
                 teacher: app.vue.new_teacher,
 				rating: app.vue.new_rating,
+				workload: app.vue.new_workload,
+				difficulty: app.vue.new_difficulty,
 				review: app.vue.new_review,
             }).then(function (response) {
 			app.get_reviews(course_id);
@@ -61,7 +65,9 @@ let init = (app) => {
     app.clear_new_post = () => {
         app.vue.new_review = "";
         app.vue.new_teacher = "";
-        app.vue.new_rating = 0;
+        app.vue.new_rating = 1;
+		app.vue.new_workload = 1;
+        app.vue.new_difficulty = 1;
     };
 
     app.enumerate = (a) => {
@@ -109,7 +115,9 @@ let init = (app) => {
     // And this initializes it.
     app.init = () => {
         app.get_reviews();
-        new_rating=0;
+		new_rating=1;
+        new_workload=1;
+		new_difficulty=1;
     };
 
     // Call to the initializer.
