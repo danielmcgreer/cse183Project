@@ -55,7 +55,7 @@ def add_course():
                 Field('class_name', requires=IS_NOT_EMPTY()),
                 Field('class_description', 'text', requires=IS_NOT_EMPTY())],
                 csrf_session=session, formstyle=FormStyleBulma)
-    
+
     # if form is accepted
     if form.accepted:
         # Check if there is a course that already exists with the entered info
@@ -70,8 +70,8 @@ def add_course():
                                 class_description = form.vars["class_description"])
         redirect(URL('index'))
     return dict(form=form)
-  
-    
+
+
 @action('add_review', method=["GET", "POST"])
 @action.uses(db, session, auth.user, 'add_review.html')
 def add_review():
@@ -83,7 +83,7 @@ def add_review():
                 Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
                 Field('review', 'text')],
                 csrf_session=session, formstyle=FormStyleBulma)
-    
+
     # if form is accepted
     if form.accepted:
         # Check if there is a course that already exists with the entered info
@@ -101,11 +101,11 @@ def add_review():
         # insert the review into the reviews table
         db.reviews.insert(teacher = form.vars["teacher"],
                          rating = form.vars["rating"],
-                         review = form.vars["review"], 
+                         review = form.vars["review"],
                          course_id = course.id)
         redirect(URL('index'))
     return dict(form=form)
-    
+
 @action('edit_review/<review_id:int>', method=["GET", "POST"])
 @action.uses(db, session, auth.user, 'edit_review.html')
 def edit(review_id=None):
@@ -119,7 +119,7 @@ def edit(review_id=None):
     if form.accepted:
         redirect(URL('index'))
     return dict(form=form)
-    
+
 @action('delete_review')
 @action.uses(url_signer.verify(), db, session, auth.user)
 def delete():
@@ -185,7 +185,8 @@ def submit_review(course_id):
         rating = request.json.get('rating'),
         review=request.json.get('review'),
     )
-    created_by=get_user_email()
+    created_by = get_user_email()
+
     return dict(created_by=created_by)
 
 

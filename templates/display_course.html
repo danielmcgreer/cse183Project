@@ -30,14 +30,14 @@
 	  </p>
 	</div>
 	<div class="field">
-	   <select v-model="new_rating">
-		  <option disabled value="">Please select one</option>
-		  <option value="1">One Star</option>
-		  <option value="2">Two Star</option>
-		  <option value="3">Three Star</option>
-		  <option value="4">Four Star</option>
-		  <option value="5">Five Star</option>
-		</select>
+	   <span @mouseout="stars_out()">
+                <span @mouseover="stars_over(star_idx)"
+					  @click="set_stars(star_idx)"
+                      v-for="star_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="star_idx <= new_rating" class="fa fa-star"></i>
+                  <i v-if="star_idx > new_rating" class="fa fa-star-o"></i>
+                </span>
+	   </span>
 	</div>
 	<div class="field">
 	  <p class="control">
@@ -59,7 +59,12 @@
       </tr>
       <tr v-for="r in reviews_list.slice().reverse()">
         <td>{{r.teacher}}</td>
-        <td>{{r.rating}}</td>
+        <td>
+		<span v-for="star_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="star_idx <= r.rating" class="fa fa-star"></i>
+                  <i v-if="star_idx > r.rating" class="fa fa-star-o"></i>
+                </span>
+		</td>
         <td>{{r.review}}</td>
 		<td>
 		<div v-if="r.created_by==current_user">
