@@ -8,73 +8,119 @@
 
 <div class="section" id="vue-target" v-cloak>
 
-  <h1 class="title">Course Reviews for [[=course_info.department]] [[=course_info.class_number]] [[=course_info.class_name]] </h1>
+  <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
   
-  <a class="button is-success" href="[[=URL('search_course')]]">
+    <br><br>
+        <div class="box">
+          <h3 class="title">
+                Course Description
+          </h3>
+          <div>
+              [[=course_info.class_description]]
+          </div>
+        </div>
+    <br><br>
+  
+  <a class="button is-link" href="[[=URL('search_course')]]">
     <span>Search Another Course</span>
   </a>
   
-  <a class="button is-success" href="[[=URL('index')]]">
+  <a class="button is-warning" href="[[=URL('index')]]">
     <span>Back to Main Page</span>
   </a>
   
-  <a class="button is-success" @click="set_add_status(true)">
-	<span>Write a Review</span>
-  </a>
-  
+  <!-- Vue Form -->
 	<div v-if="adding_new_review" class="field">
 	<div class="form">
 	<div class="field">
 	  <p class="control">
-		<textarea class="text" placeholder="e.g. Hello world!" rows="3" v-model="new_teacher"></textarea>
+	    <br>  
+        <label for="teacher" style="font-size: 20px;"><b>Professor Name</b></label> 
+        <br>
+		<input class="textarea is-primary" placeholder="Professor Name..." rows="3" v-model="new_teacher">
 	  </p>
-	</div>
-	<div class="field">
-	   <span @mouseout="stars_out()">
-                <span @mouseover="stars_over(star_idx)"
-					  @click="set_stars(star_idx)"
-                      v-for="star_idx in [1, 2, 3, 4, 5]">
-                  <i v-if="star_idx <= new_rating" class="fa fa-star"></i>
-                  <i v-if="star_idx > new_rating" class="fa fa-star-o"></i>
-                </span>
-	   </span>
 	</div>
 	<div class="field">
 	  <p class="control">
-		<textarea class="textarea" placeholder="e.g. Hello world!" rows="3" v-model="new_review"></textarea>
+	    <label for="review" style="font-size: 20px;"><b>Write a Review</b></label>   
+		<textarea class="textarea is-primary" placeholder="Write a review..." rows="3" v-model="new_review"></textarea>
 	  </p>
+	</div>
+	<div class="field">
+	   <label for="rating" style="font-size: 18px;"><b>Overall Class Rating</b></label>
+	   <br>
+	   <div class="box">
+    	   <span @mouseout="stars_out()">
+                <span @mouseover="stars_over(star_idx)"
+					  @click="set_stars(star_idx)"
+                      v-for="star_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="star_idx <= new_rating" class="fas fa-star"></i>
+                  <i v-if="star_idx > new_rating" class="far fa-star"></i>
+                </span>
+    	   </span>
+	   </div>
+	</div>
+	<div class="field">
+	   <label for="rating" style="font-size: 18px;"><b>Class Difficulty Rating</b></label>
+	   <br>
+	   <div class="box">
+    	   <span @mouseout="bombs_out()">
+                    <span @mouseover="bombs_over(bomb_idx)"
+    					  @click="set_bombs(bomb_idx)"
+                          v-for="bomb_idx in [1, 2, 3, 4, 5]">
+                      <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry"></i>
+                      <i v-if="bomb_idx > new_difficulty" class="far fa-angry"></i>
+                    </span>
+    	   </span>
+	   </div>
+	</div>
+	<div class="field">
+	   <label for="rating" style="font-size: 18px;"><b>Class Workload Rating</b></label>
+	   <br>
+	   <div class="box">
+    	   <span @mouseout="planes_out()">
+                    <span @mouseover="planes_over(plane_idx)"
+    					  @click="set_planes(plane_idx)"
+                          v-for="plane_idx in [1, 2, 3, 4, 5]">
+                      <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane"></i>
+                      <i v-if="plane_idx > new_workload" class="far fa-paper-plane"></i>
+                    </span>
+    	   </span>
+	   </div>
 	</div>
 	  <button class="button is-primary" @click="submit_review" >Submit Review</button>
 	  <button class="button is-warning" @click="set_add_status(false)" >Cancel</button>
 	</div>
 	</div>
 	
-	
   <div id="reviews_list" class="container">
-    <table class="table is-striped is-fullwidth">
-      <tr>
-        <th>Teacher</th>
-        <th>Rating</th>
-        <th>Review</th>
-      </tr>
-      <tr v-for="r in reviews_list.slice().reverse()">
-        <td>{{r.teacher}}</td>
-        <td>
-		<span v-for="star_idx in [1, 2, 3, 4, 5]">
+        <br><br>
+        <h2 class="title">
+            [[=course_info.department]] [[=course_info.class_number]] Reviews 
+        </h2>
+        <a class="button is-primary" @click="set_add_status(true)">
+            <span>Write a Review</span>
+        </a>
+        <br><br>
+        <div v-for="r in reviews_list.slice().reverse()">
+        <div class="box">
+            <div>{{r.review}}</div>
+            <br>
+            <div><b>Professor:</b> {{r.teacher}}</div>
+            <div>
+                <b>Overall Experience</b>
+                <span v-for="star_idx in [1, 2, 3, 4, 5]">
                   <i v-if="star_idx <= r.rating" class="fa fa-star"></i>
                   <i v-if="star_idx > r.rating" class="fa fa-star-o"></i>
                 </span>
-		</td>
-        <td>{{r.review}}</td>
-		<td>
-		<div v-if="r.created_by==current_user">
-			<p class="has-text-right has-text-danger is-size-4"><span class="icon"><i @click="delete_review(r._idx)" class="fa fa-fw fa-trash"></i></span></p>
-		</div>
-		</td>
-      </tr>
-	  [[pass]]
-
-    </table>
+            </div>
+            <br>
+            <div class="is-size-6 has-text-grey">{{r.author}}</div>
+        	<div v-if="r.created_by==current_user">
+        		<p class="has-text-right has-text-danger is-size-4"><span class="icon"><i @click="delete_review(r._idx)" class="fa fa-fw fa-trash"></i></span></p>
+        	</div>
+        </div>
+        <br>
   </div>
 </div>
 
