@@ -148,17 +148,38 @@ def search_course():
 @action('display_courses/<major_id>/<course_num:int>')
 @action.uses(db, auth, 'display_courses.html')
 def display_courses(major_id=None, course_num=None):
-#TODO if args eq none then do something
+    #TODO if args eq none then do something
     if(course_num==None):
         course_num=0
+        
     perfectMatches = db((db.courses.department == major_id) &
                         (db.courses.class_number == course_num)).select()
     closeMatches1 = db((db.courses.department == major_id) &
                         (db.courses.class_number != course_num)).select()
     closeMatches2 = db((db.courses.department != major_id) &
                         (db.courses.class_number == course_num)).select()
-
+       
     allMatches = perfectMatches+closeMatches1+closeMatches2
+       
+    for match in allMatches:
+        reviews = db(db.reviews.course_id == match.id).select()
+        review_sum = 0
+        workload_sum = 0
+        difficulty_sum = 0
+        review_count= 0
+        for review in reviews:
+            review_sum = review_sum+review.rating
+            workload_sum = workload_sum+review.workload
+            difficulty_sum = difficulty_sum+review.difficulty
+            review_count = review_count+1
+
+        if(review_count != 0):
+            match["avg_review"] = round(review_sum/review_count, 1)
+            match["avg_workload"] = round(workload_sum/review_count, 1)
+            match["avg_difficulty"] = round(difficulty_sum/review_count, 1)
+        else:
+            match["avg_review"] = 0
+
     return dict(allMatches=allMatches, url_signer=url_signer)
 
 
