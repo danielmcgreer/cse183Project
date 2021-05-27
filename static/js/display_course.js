@@ -77,6 +77,7 @@ let init = (app) => {
         return a;
     };
 
+    // Star Rating
     app.stars_out = () => {
         app.vue.new_rating = new_rating;
     };
@@ -89,6 +90,34 @@ let init = (app) => {
         new_rating = num_stars;
         // Sets the stars on the server.
     };
+    
+    // Difficulty Rating
+    app.bombs_out = () => {
+        app.vue.new_difficulty = new_difficulty;
+    };
+
+    app.bombs_over = (num_bombs) => {
+        app.vue.new_difficulty = num_bombs;
+    };
+
+    app.set_bombs = (num_bombs) => {
+        new_difficulty = num_bombs;
+        // Sets the bombs on the server.
+    };
+    
+    // Workload
+    app.planes_out = () => {
+        app.vue.new_workload = new_workload;
+    };
+
+    app.planes_over = (num_planes) => {
+        app.vue.new_workload = num_planes;
+    };
+
+    app.set_planes = (num_planes) => {
+        new_workload = num_planes;
+        // Sets the planes on the server.
+    };
 
     // dictionary of all methods
     app.methods = {
@@ -97,6 +126,14 @@ let init = (app) => {
         set_stars: app.set_stars,
         stars_over: app.stars_over,
         stars_out: app.stars_out,
+        
+        set_bombs: app.set_bombs,
+        bombs_over: app.bombs_over,
+        bombs_out: app.bombs_out,
+        
+        set_planes: app.set_planes,
+        planes_over: app.planes_over,
+        planes_out: app.planes_out,
 
 		get_reviews: app.get_reviews,
 		set_add_status: app.set_add_status,
