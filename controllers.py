@@ -59,16 +59,16 @@ def add_course():
     # if form is accepted
     if form.accepted:
         # Check if there is a course that already exists with the entered info
-        if db((db.courses.department == form.vars["department"]) &
-              (db.courses.class_number == form.vars["class_number"]) &
-              (db.courses.class_name == form.vars["class_name"]) &
-              (db.courses.class_description == form.vars["class_description"])).select().first() == None:
+        if db((db.courses.department == form.vars["department"].upper()) &
+              (db.courses.class_number == form.vars["class_number"])).select().first() == None:
               # If there is no course with the inputted info then create the course by inserting its info into the courses table
-              db.courses.insert(department = form.vars["department"],
+              db.courses.insert(department = form.vars["department"].upper(),
                                 class_number = form.vars["class_number"],
                                 class_name = form.vars["class_name"],
                                 class_description = form.vars["class_description"])
-        redirect(URL('index'))
+        
+        redirect(URL('display_course', form.vars["department"].upper(), form.vars["class_number"]))        
+        
     return dict(form=form)
 
 
@@ -121,7 +121,8 @@ def edit(review_id=None):
     if p.created_by == auth.current_user.get('email'):
         form = Form(db.reviews, record=p, deletable=False, csrf_session=session, formstyle=FormStyleBulma)
     if form.accepted:
-        redirect(URL('index'))
+        redirect(URL('users_reviews'))
+        
     return dict(form=form)
 
 @action('delete_review')
