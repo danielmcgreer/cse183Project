@@ -54,8 +54,8 @@
                 <span @mouseover="stars_over(star_idx)"
 					  @click="set_stars(star_idx)"
                       v-for="star_idx in [1, 2, 3, 4, 5]">
-                  <i v-if="star_idx <= new_rating" class="fas fa-star"></i>
-                  <i v-if="star_idx > new_rating" class="far fa-star"></i>
+                  <i v-if="star_idx <= new_rating" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
+                  <i v-if="star_idx > new_rating" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
                 </span>
     	   </span>
 	   </div>
@@ -68,8 +68,8 @@
                     <span @mouseover="bombs_over(bomb_idx)"
     					  @click="set_bombs(bomb_idx)"
                           v-for="bomb_idx in [1, 2, 3, 4, 5]">
-                      <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry"></i>
-                      <i v-if="bomb_idx > new_difficulty" class="far fa-angry"></i>
+                      <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                      <i v-if="bomb_idx > new_difficulty" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
                     </span>
     	   </span>
 	   </div>
@@ -82,8 +82,8 @@
                     <span @mouseover="planes_over(plane_idx)"
     					  @click="set_planes(plane_idx)"
                           v-for="plane_idx in [1, 2, 3, 4, 5]">
-                      <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane"></i>
-                      <i v-if="plane_idx > new_workload" class="far fa-paper-plane"></i>
+                      <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
+                      <i v-if="plane_idx > new_workload" class="far fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
                     </span>
     	   </span>
 	   </div>
@@ -104,18 +104,34 @@
         <br><br>
         <div v-for="r in reviews_list.slice().reverse()">
         <div class="box">
+            <div><b>Professor:</b> {{r.teacher}}</div>
+            <br>
             <div>{{r.review}}</div>
             <br>
-            <div><b>Professor:</b> {{r.teacher}}</div>
             <div>
-                <b>Overall Experience</b>
+                <b>Overall Rating</b>
                 <span v-for="star_idx in [1, 2, 3, 4, 5]">
-                  <i v-if="star_idx <= r.rating" class="fa fa-star"></i>
-                  <i v-if="star_idx > r.rating" class="fa fa-star-o"></i>
+                  <i v-if="star_idx <= r.rating" class="fa fa-star" style="color: rgb(230,230,0);"></i>
+                  <i v-if="star_idx > r.rating" class="fa fa-star-o" style="color: rgb(230,230,0);"></i>
+                </span>
+            </div>
+            <div>
+                <b>Difficulty</b>
+                <span v-for="bomb_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="bomb_idx <= r.difficulty" class="fas fa-angry" style="color: rgb(255,77,77)"></i>
+                  <i v-if="bomb_idx > r.difficulty" class="far fa-angry" style="color: rgb(255,77,77)"></i>
+                </span>
+            </div>
+            <div>
+                <b>Workload</b>
+                <span v-for="plane_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="plane_idx <= r.workload" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                  <i v-if="plane_idx > r.workload" class="far fa-paper-plane" style="color: rgb(0,153,230)"></i>
                 </span>
             </div>
             <br>
-            <div class="is-size-6 has-text-grey">{{r.author}}</div>
+            <!-- Trying to get the author of each Review -->
+            <div class="is-size-6 has-text-grey"><i>by {{r.author}}</i></div>
         	<div v-if="r.created_by==current_user">
         		<p class="has-text-right has-text-danger is-size-4"><span class="icon"><i @click="delete_review(r._idx)" class="fa fa-fw fa-trash"></i></span></p>
         	</div>
