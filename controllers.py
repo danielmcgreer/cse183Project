@@ -80,9 +80,9 @@ def add_review():
                 Field('class_number',  'integer', requires=IS_NOT_EMPTY()),
                 Field('class_name', requires=IS_NOT_EMPTY()),
                 Field('teacher', requires=IS_NOT_EMPTY()),
-                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
-                Field('workload', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
-                Field('diffuculty', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
+                Field('rating', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
+                Field('workload', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
+                Field('diffuculty', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
                 Field('review', 'text')],
                 csrf_session=session, formstyle=FormStyleBulma)
 
