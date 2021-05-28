@@ -12,20 +12,75 @@ let init = (app) => {
         reviews_list: [],
 		adding_new_review: false,
 		new_teacher: "",
-		new_rating: 1,
-		new_workload: 1,
-		new_difficulty: 1,
+		new_rating: 0,
+		new_workload: 0,
+		new_difficulty: 0,
 		new_review: "",
 		author:"",
-		current_user:""
+		current_user:"",
+		
+		not_logged_in_wanring: false,
+		no_teacher_warning: false,
+		no_rating_warning: false,
+		no_workload_warning: false,
+		no_difficulty_warning: false,
+		no_review_warning: false
     };
 
     app.set_add_status = function (new_status) {
+		if(app.vue.current_user == null){
+			app.vue.not_logged_in_wanring = true;
+			return;
+		}
+		else{
+			not_logged_in_wanring = false;
+		}
 		app.clear_new_post();
         app.vue.adding_new_review = new_status;
     };
 
     app.submit_review = function () {
+		let fail = false;
+		
+		if(app.vue.new_teacher == ""){
+			fail = true;
+			app.vue.no_teacher_warning = true;
+		}
+		else{
+			app.vue.no_teacher_warning = false;
+		}
+		if(app.vue.new_rating == 0){
+			fail = true;
+			app.vue.no_rating_warning = true;
+		}
+		else{
+			app.vue.no_rating_warning = false;
+		}
+		if(app.vue.new_workload == 0){
+			fail = true;
+			app.vue.no_workload_warning = true;
+		}
+		else{
+			app.vue.no_workload_warning = false;
+		}
+		if(app.vue.new_difficulty == 0){
+			fail = true;
+			app.vue.no_difficulty_warning = true;
+		}
+		else{
+			app.vue.no_difficulty_warning = false;
+		}
+		if(app.vue.new_review == ""){
+			fail = true;
+			app.vue.no_review_warning = true;
+		}
+		else{
+			app.vue.no_review_warning = false;
+		}
+		if(fail){
+			return;
+		}
+			
         axios.post(submit_review_url+'/'+course_id,
             {
                 teacher: app.vue.new_teacher,
@@ -65,9 +120,9 @@ let init = (app) => {
     app.clear_new_post = () => {
         app.vue.new_review = "";
         app.vue.new_teacher = "";
-        app.vue.new_rating = 1;
-		app.vue.new_workload = 1;
-        app.vue.new_difficulty = 1;
+        app.vue.new_rating = 0;
+		app.vue.new_workload = 0;
+        app.vue.new_difficulty = 0;
     };
 
     app.enumerate = (a) => {
@@ -152,9 +207,15 @@ let init = (app) => {
     // And this initializes it.
     app.init = () => {
         app.get_reviews();
-		new_rating=1;
-        new_workload=1;
-		new_difficulty=1;
+		new_rating=0;
+        new_workload=0;
+		new_difficulty=0;
+		not_logged_in_wanring=false;
+		no_teacher_warning= false;
+		no_rating_wanring= false;
+		no_workload_warning= false;
+		no_difficulty_warning= false;
+		no_review_wanring= false;
     };
 
     // Call to the initializer.

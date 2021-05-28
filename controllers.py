@@ -148,17 +148,40 @@ def search_course():
 @action('display_courses/<major_id>/<course_num:int>')
 @action.uses(db, auth, 'display_courses.html')
 def display_courses(major_id=None, course_num=None):
-#TODO if args eq none then do something
+    #TODO if args eq none then do something
     if(course_num==None):
         course_num=0
+        
     perfectMatches = db((db.courses.department == major_id) &
                         (db.courses.class_number == course_num)).select()
     closeMatches1 = db((db.courses.department == major_id) &
                         (db.courses.class_number != course_num)).select()
     closeMatches2 = db((db.courses.department != major_id) &
                         (db.courses.class_number == course_num)).select()
-
+       
     allMatches = perfectMatches+closeMatches1+closeMatches2
+       
+    for match in allMatches:
+        reviews = db(db.reviews.course_id == match.id).select()
+        review_sum = 0
+        workload_sum = 0
+        difficulty_sum = 0
+        review_count= 0
+        for review in reviews:
+            review_sum = review_sum+review.rating
+            workload_sum = workload_sum+review.workload
+            difficulty_sum = difficulty_sum+review.difficulty
+            review_count = review_count+1
+
+        if(review_count != 0):
+            match["avg_review"] = round(review_sum/review_count, 1)
+            match["avg_workload"] = round(workload_sum/review_count, 1)
+            match["avg_difficulty"] = round(difficulty_sum/review_count, 1)
+        else:
+            match["avg_review"] = 0
+            match["avg_workload"] = 0
+            match["avg_difficulty"] =0
+
     return dict(allMatches=allMatches, url_signer=url_signer)
 
 
@@ -174,11 +197,35 @@ def display_course(major_id=None, course_num=None):
 
     #grab all reviews with that course
     reviews = db((db.reviews.course_id == course_info.id)).select()
+    
+    avg_review = 0
+    avg_difficulty = 0
+    avg_workload = 0
+    review_sum = 0
+    workload_sum = 0
+    difficulty_sum = 0
+    review_count= 0
+    for review in reviews:
+        review_sum = review_sum+review.rating
+        workload_sum = workload_sum+review.workload
+        difficulty_sum = difficulty_sum+review.difficulty
+        review_count = review_count+1
+
+    if(review_count != 0):
+        avg_review = round(review_sum/review_count, 1)
+        avg_workload = round(workload_sum/review_count, 1)
+        avg_difficulty = round(difficulty_sum/review_count, 1)
+    else:
+        avg_review = 0
+        avg_workload = 0
+        avg_difficulty = 0
 
     return dict(get_reviews_url = URL('get_reviews'),
                 submit_review_url = URL('submit_review'),
                 delete_review_url = URL('delete_review', signer=url_signer),
-                course_info=course_info, course_id=course_info.id, reviews=reviews, url_signer=url_signer)
+                course_info=course_info, course_id=course_info.id, reviews=reviews,
+                url_signer=url_signer, avg_review=avg_review, avg_difficulty=avg_difficulty,
+                avg_workload=avg_workload)
 
 
 @action('submit_review/<course_id:int>', method="POST")
@@ -186,6 +233,7 @@ def display_course(major_id=None, course_num=None):
 def submit_review(course_id):
     db.reviews.insert(
         course_id=course_id,
+        created_by = get_user_email(),
         teacher=request.json.get('teacher'),
         rating = request.json.get('rating'),
         workload = request.json.get('workload'),
