@@ -10,6 +10,10 @@
 
   <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
   
+	<div class="is-size-5">Average rating: [[=avg_review]]</div>
+	<div class="is-size-5">Average workload: [[=avg_workload]]</div>
+	<div class="is-size-5">Average difficulty: [[=avg_difficulty]]</div>
+  
     <br><br>
         <div class="box">
           <h3 class="title">
@@ -40,12 +44,20 @@
 		<input class="textarea is-primary" placeholder="Professor Name..." rows="3" v-model="new_teacher">
 	  </p>
 	</div>
+	<div v-if="no_teacher_warning" class="field">
+		<span style="color:red"> Teacher feild must not be blank </span>
+	</div>
 	<div class="field">
 	  <p class="control">
 	    <label for="review" style="font-size: 20px;"><b>Write a Review</b></label>   
 		<textarea class="textarea is-primary" placeholder="Write a review..." rows="3" v-model="new_review"></textarea>
 	  </p>
 	</div>
+	
+	<div v-if="no_review_warning" class="field">
+		<span style="color:red"> Please write something as a review </span>
+	</div>
+	
 	<div class="field">
 	   <label for="rating" style="font-size: 18px;"><b>Overall Class Rating</b></label>
 	   <br>
@@ -60,6 +72,11 @@
     	   </span>
 	   </div>
 	</div>
+	
+	<div v-if="no_rating_warning" class="field">
+		<span style="color:red"> Please rate the course </span>
+	</div>
+	
 	<div class="field">
 	   <label for="rating" style="font-size: 18px;"><b>Class Difficulty Rating</b></label>
 	   <br>
@@ -74,6 +91,11 @@
     	   </span>
 	   </div>
 	</div>
+	
+	<div v-if="no_difficulty_warning" class="field">
+		<span style="color:red"> Please mark the difficulty for the course </span>
+	</div>
+	
 	<div class="field">
 	   <label for="rating" style="font-size: 18px;"><b>Class Workload Rating</b></label>
 	   <br>
@@ -88,6 +110,11 @@
     	   </span>
 	   </div>
 	</div>
+	
+	<div v-if="no_workload_warning" class="field">
+		<span style="color:red"> Please mark the workload for the course </span>
+	</div>
+	
 	  <button class="button is-primary" @click="submit_review" >Submit Review</button>
 	  <button class="button is-warning" @click="set_add_status(false)" >Cancel</button>
 	</div>
@@ -101,6 +128,9 @@
         <a class="button is-primary" @click="set_add_status(true)">
             <span>Write a Review</span>
         </a>
+		<div v-if="not_logged_in_wanring" class="field">
+			<span style="color:red"> Please log in to write a review </span>
+		</div>
         <br><br>
         <div v-for="r in reviews_list.slice().reverse()">
         <div class="box">
@@ -131,7 +161,7 @@
             </div>
             <br>
             <!-- Trying to get the author of each Review -->
-            <div class="is-size-6 has-text-grey"><i>by {{r.author}}</i></div>
+            <div class="is-size-6 has-text-grey"><i>by {{r.created_by}}</i></div>
         	<div v-if="r.created_by==current_user">
         		<p class="has-text-right has-text-danger is-size-4"><span class="icon"><i @click="delete_review(r._idx)" class="fa fa-fw fa-trash"></i></span></p>
         	</div>
