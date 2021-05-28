@@ -34,6 +34,7 @@ from py4web.utils.form import Form, FormStyleBulma
 from .common import Field
 from pydal.validators import *
 from .models import get_user_email
+from .models import get_username
 
 url_signer = URLSigner(session)
 #TODO make signing everywhere and make sure you can only mess with your own reviews
@@ -178,9 +179,9 @@ def display_courses(major_id=None, course_num=None):
             match["avg_workload"] = round(workload_sum/review_count, 1)
             match["avg_difficulty"] = round(difficulty_sum/review_count, 1)
         else:
-            match["avg_review"] = 0
-            match["avg_workload"] = 0
-            match["avg_difficulty"] =0
+            match["avg_review"] = "N/A"
+            match["avg_workload"] = "N/A"
+            match["avg_difficulty"] = "N/A"
 
     return dict(allMatches=allMatches, url_signer=url_signer)
 
@@ -198,9 +199,6 @@ def display_course(major_id=None, course_num=None):
     #grab all reviews with that course
     reviews = db((db.reviews.course_id == course_info.id)).select()
     
-    avg_review = 0
-    avg_difficulty = 0
-    avg_workload = 0
     review_sum = 0
     workload_sum = 0
     difficulty_sum = 0
@@ -216,9 +214,9 @@ def display_course(major_id=None, course_num=None):
         avg_workload = round(workload_sum/review_count, 1)
         avg_difficulty = round(difficulty_sum/review_count, 1)
     else:
-        avg_review = 0
-        avg_workload = 0
-        avg_difficulty = 0
+        avg_review = "N/A"
+        avg_workload = "N/A"
+        avg_difficulty = "N/A"
 
     return dict(get_reviews_url = URL('get_reviews'),
                 submit_review_url = URL('submit_review'),
@@ -234,6 +232,7 @@ def submit_review(course_id):
     db.reviews.insert(
         course_id=course_id,
         created_by = get_user_email(),
+        created_by_username = get_username(),
         teacher=request.json.get('teacher'),
         rating = request.json.get('rating'),
         workload = request.json.get('workload'),
