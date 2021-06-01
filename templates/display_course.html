@@ -9,11 +9,31 @@
 <div class="section" id="vue-target" v-cloak>
 
   <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
-  
-	<div class="is-size-5">Average rating: [[=avg_review]]</div>
-	<div class="is-size-5">Average difficulty: [[=avg_difficulty]]</div>
-	<div class="is-size-5">Average workload: [[=avg_workload]]</div>
-  
+
+	<div class="is-size-5">Average rating:
+        <span v-if="avg_rating>0">
+        {{avg_rating}}/5
+        </span>
+        <span v-else>
+            N/A
+        </span>
+    </div>
+	<div class="is-size-5">Average difficulty:
+    <span v-if="avg_difficulty>0">
+        {{avg_difficulty}}/5
+        </span>
+        <span v-else>
+            N/A
+        </span>
+    </div>
+	<div class="is-size-5">Average workload:
+    <span v-if="avg_workload>0">
+        {{avg_workload}}/5
+        </span>
+        <span v-else>
+            N/A
+        </span>
+     </div>
     <br><br>
         <div class="box">
           <h3 class="title">

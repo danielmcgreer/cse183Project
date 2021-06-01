@@ -247,19 +247,49 @@ def submit_review(course_id):
 @action('get_reviews/<course_id:int>')
 @action.uses(db)
 def get_reviews(course_id):
+    # grab all reviews with that course
+    reviews = db(db.reviews.course_id==course_id).select()
+    review_sum = 0
+    workload_sum = 0
+    difficulty_sum = 0
+    review_count = 0
     name=get_user_email()
     the_reviews = db(db.reviews.course_id == course_id).select().as_list()
-    return dict(the_reviews=the_reviews, name=name)
+
+    for review in reviews:
+        review_sum = review_sum + review.rating
+        workload_sum = workload_sum + review.workload
+        difficulty_sum = difficulty_sum + review.difficulty
+        review_count = review_count + 1
+
+    if (review_count != 0):
+        avg_review = round(review_sum / review_count, 1)
+        avg_workload = round(workload_sum / review_count, 1)
+        avg_difficulty = round(difficulty_sum / review_count, 1)
+    else:
+        avg_review = "N/A"
+        avg_workload = "N/A"
+        avg_difficulty = "N/A"
+    return dict(the_reviews=the_reviews, name=name,avg_review=avg_review, avg_difficulty=avg_difficulty,
+                avg_workload=avg_workload)
 
  
 @action('users_reviews')
 @action.uses(db, auth, 'users_reviews.html')
 def users_reviews():
 #TODO if args eq none then do something
+    the_reviews = db(db.reviews.created_by == get_user_email()).select().as_list()
     rows = db((db.reviews.created_by == get_user_email()) &
                 (db.courses.id == db.reviews.course_id)).select()
-    return dict(rows=rows, url_signer=url_signer) 
-    
+    return dict(rows=rows,the_reviews=the_reviews,delete_review_url = URL('delete_review', signer=url_signer), get_users_reviews_url = URL('get_users_reviews'), url_signer=url_signer)
+
+@action('get_users_reviews')
+@action.uses(db)
+def get_reviews():
+    the_reviews = db(db.reviews.created_by == get_user_email()).select().as_list()
+    return dict(the_reviews=the_reviews)
+
+
 @action('search')
 @action.uses()
 def search():
