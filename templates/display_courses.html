@@ -26,9 +26,23 @@
                 <div class="is-size-3"><b>[[=match.department]] [[=match.class_number]]: [[=match.class_name]]</b></div>
                 <div class="is-size-5">[[=match.class_description]]</div>
                 <br>
-                <div class="is-size-5">Average rating: [[=match.avg_review]]</div>
-				<div class="is-size-5">Average workload: [[=match.avg_workload]]</div>
-				<div class="is-size-5">Average difficulty: [[=match.avg_difficulty]]</div>
+                <div style="display: flex; justify-content: space-between;">
+                    <div class="is-size-5">
+                        <b>Average Rating:</b> 
+                        [[=match.avg_review]]
+                         <i class="fa fa-star" style="color: rgb(230,230,0);"></i>
+                    </div>
+    				<div class="is-size-5">
+    				    <b>Average Workload:</b> 
+    				    [[=match.avg_workload]]
+    				    <i class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+    				</div>
+    				<div class="is-size-5">
+    				    <b>Average Difficulty:</b> 
+    				    [[=match.avg_difficulty]]
+    				    <i class="fas fa-angry" style="color: rgb(255,77,77)"></i>
+    				</div>
+    			</div>
                 <br>
                 <a class="button is-primary" href="[[=URL('display_course', match.department, match.class_number)]]">
                     <span>See Reviews</span>

@@ -7,22 +7,39 @@
 </style>
 
 <div class="section" id="vue-target" v-cloak>
-
-  <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
-  
-	<div class="is-size-5">Average rating: [[=avg_review]]</div>
-	<div class="is-size-5">Average difficulty: [[=avg_difficulty]]</div>
-	<div class="is-size-5">Average workload: [[=avg_workload]]</div>
-  
-    <br><br>
-        <div class="box">
-          <h3 class="title">
-                Course Description
-          </h3>
-          <div>
-              [[=course_info.class_description]]
-          </div>
+    
+    <div class="box">
+      <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
+      
+      <br>
+      
+      <div style="display: flex; justify-content: space-around;">
+    	<div class="is-size-5">
+            <b>Average Rating:</b> 
+            [[=avg_review]]
+             <i class="fa fa-star" style="color: rgb(230,230,0);"></i>
         </div>
+    	<div class="is-size-5">
+    	    <b>Average Workload:</b> 
+    	    [[=avg_workload]]
+    	    <i class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+    	</div>
+    	<div class="is-size-5">
+    	    <b>Average Difficulty:</b> 
+    	    [[=avg_difficulty]]
+    	    <i class="fas fa-angry" style="color: rgb(255,77,77)"></i>
+    	</div>
+      </div>
+      
+      <br><br>
+
+      <h3 class="title">
+            Course Description
+      </h3>
+      <div>
+          [[=course_info.class_description]]
+      </div>
+    </div>
     <br><br>
   
   <a class="button is-link" href="[[=URL('search_course')]]">
