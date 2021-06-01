@@ -278,15 +278,15 @@ def get_reviews(course_id):
 @action.uses(db, auth, 'users_reviews.html')
 def users_reviews():
 #TODO if args eq none then do something
-    the_reviews = db(db.reviews.created_by == get_user_email()).select().as_list()
-    rows = db((db.reviews.created_by == get_user_email()) &
-                (db.courses.id == db.reviews.course_id)).select()
-    return dict(rows=rows,the_reviews=the_reviews,delete_review_url = URL('delete_review', signer=url_signer), get_users_reviews_url = URL('get_users_reviews'), url_signer=url_signer)
+    the_reviews = db((db.reviews.created_by == get_user_email()) &
+                (db.courses.id == db.reviews.course_id)).select().as_list()
+    return dict(the_reviews=the_reviews,delete_review_url = URL('delete_review', signer=url_signer), get_users_reviews_url = URL('get_users_reviews'), url_signer=url_signer)
 
 @action('get_users_reviews')
 @action.uses(db)
 def get_reviews():
-    the_reviews = db(db.reviews.created_by == get_user_email()).select().as_list()
+    the_reviews = db((db.reviews.created_by == get_user_email()) &
+                (db.courses.id == db.reviews.course_id)).select().as_list()
     return dict(the_reviews=the_reviews)
 
 

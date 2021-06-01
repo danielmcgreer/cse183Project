@@ -22,9 +22,22 @@
             <span class="icon"><i class="fa fa-fw fa-pencil"></i></span> <span>Edit</span>
           </a>
            </p>
-            <div><b>Professor:</b> {{r.teacher}}</div>
+           <div>
+               <b>{{r.courses.department}} {{r.courses.class_number}}:
+                   {{r.courses.class_name}}</b>
+
+           </div>
             <br>
-            <div>{{r.review}}</div>
+            <div v-for="fn in ['teacher', 'review']">
+            <div class="control">
+                <div><b><span v-if="fn=='teacher'">Professor:</span></b>
+                    <span v-if="fn=='teacher'"><input type="text" class="input" v-model="r.reviews[fn]"/></span>
+                    <span v-else><textarea class="textarea" v-model="r.reviews[fn]"></textarea></span>
+                </div>
+                <br>
+            </div>
+
+            </div>
             <br>
             <div>
                 <b>Overall Rating</b>

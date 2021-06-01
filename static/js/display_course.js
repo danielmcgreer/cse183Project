@@ -92,6 +92,7 @@ let init = (app) => {
 				workload: app.vue.new_workload,
 				difficulty: app.vue.new_difficulty,
 				review: app.vue.new_review,
+				_state: {teacher: "clean", review: "clean"},
             }).then(function (response) {
 			app.get_reviews(course_id);
 			app.enumerate(app.vue.reviews_list);
@@ -102,7 +103,7 @@ let init = (app) => {
 
     app.get_reviews = () => {
 		axios.get(get_reviews_url+'/'+course_id).then(function (response) {
-            app.vue.reviews_list = app.enumerate(response.data.the_reviews);
+            app.vue.reviews_list = app.decorate(app.enumerate(response.data.the_reviews));
             app.vue.current_user=response.data.name;
             app.vue.avg_rating=response.data.avg_review;
             app.vue.avg_difficulty=response.data.avg_difficulty;
@@ -121,6 +122,8 @@ let init = (app) => {
                     break;
                 }
             }
+            }).then(() => {
+                app.get_reviews();
             });
     };
 
@@ -139,6 +142,10 @@ let init = (app) => {
         a.map((e) => {e._idx = k++;});
         return a;
     };
+    app.decorate = (a) => {
+        a.map((e) => {e._state = {teacher: "clean", review: "clean"} ;});
+        return a;
+    }
 
     // Star Rating
     app.stars_out = () => {

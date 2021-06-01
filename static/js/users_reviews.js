@@ -15,16 +15,17 @@ let init = (app) => {
 
     app.get_reviews = () => {
 		axios.get(get_users_reviews_url).then(function (response) {
-		    console.log(response.data.the_reviews);
-            app.vue.reviews_list = app.enumerate(response.data.the_reviews);
+            app.vue.reviews_list = app.decorate(app.enumerate(response.data.the_reviews));
         });
     };
 
     app.delete_review = function(row_idx) {
-        let id = app.vue.reviews_list[row_idx].id;
+        console.log(app.vue.reviews_list[0].reviews.id);
+        console.log("hi");
+        let id = app.vue.reviews_list[row_idx].reviews.id;
         axios.get(delete_review_url, {params: {id: id}}).then(function (response) {
             for (let i = 0; i < app.vue.reviews_list.length; i++) {
-                if (app.vue.reviews_list[i].id === id) {
+                if (app.vue.reviews_list[i].reviews.id === id) {
                     app.vue.reviews_list.splice(i, 1);
                     app.enumerate(app.vue.reviews_list);
                     break;
