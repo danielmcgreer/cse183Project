@@ -127,6 +127,44 @@ let init = (app) => {
             });
     };
 
+    app.set_edit_status = function (new_status,row_idx) {
+		if(app.vue.current_user == null){
+			app.vue.not_logged_in_wanring = true;
+			return;
+		}
+		else{
+			not_logged_in_wanring = false;
+		}
+		app.vue.adding_new_review=false;
+        app.vue.reviews_list[row_idx].edit_new_review = new_status;
+        new_rating=app.vue.reviews_list[row_idx].rating;
+        app.vue.new_rating = new_rating;
+        new_difficulty=app.vue.reviews_list[row_idx].difficulty;
+        app.vue.new_difficulty = new_difficulty;
+        new_workload=app.vue.reviews_list[row_idx].workload;
+        app.vue.new_workload = new_workload;
+    };
+
+    app.stop_edit = function (row_idx) {
+        let r = app.vue.reviews_list[row_idx];
+        axios.post(edit_review_url,
+            {
+                id: r.id,
+                teacher: r.teacher,
+                review: r.review,
+                rating: new_rating,
+                difficulty: new_difficulty,
+                workload: new_workload
+            }).then(function (response) {
+               app.get_reviews();
+               app.set_edit_status(false,row_idx);
+
+
+            });
+
+        }
+
+
 
     app.clear_new_post = () => {
         app.vue.new_review = "";
@@ -139,7 +177,9 @@ let init = (app) => {
     app.enumerate = (a) => {
         // This adds an _idx field to each element of the array.
         let k = 0;
-        a.map((e) => {e._idx = k++;});
+        a.map((e) => {e._idx = k++;
+                      e.edit_new_review=false;
+        });
         return a;
     };
     app.decorate = (a) => {
@@ -189,6 +229,9 @@ let init = (app) => {
         // Sets the planes on the server.
     };
 
+
+
+
     // dictionary of all methods
     app.methods = {
         // API methods
@@ -206,6 +249,8 @@ let init = (app) => {
         planes_out: app.planes_out,
 
 		get_reviews: app.get_reviews,
+		set_edit_status: app.set_edit_status,
+		stop_edit: app.stop_edit,
 		set_add_status: app.set_add_status,
 		submit_review: app.submit_review,
         clear_new_post: app.clear_new_post,
