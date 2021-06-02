@@ -1,53 +1,120 @@
 [[extend 'layout.html']]
 
-<div class="section">
+
+
+<div class="section" id="vue-target">
 
   <h1 class="title">My Reviews</h1>
-  
-  <a class="button is-success" href="[[=URL('search_course')]]">
+
+  <a class="button is-link" href="[[=URL('search_course')]]">
     <span>Search Another Course</span>
   </a>
-  
-  <a class="button is-success" href="[[=URL('index')]]">
+
+  <a class="button is-warning" href="[[=URL('index')]]">
     <span>Back to Main Page</span>
   </a>
 
-  <div class="container">
-    <table class="table is-striped is-fullwidth">
-      <tr>
-        <th>Course</th>
-        <th>Number</th>
-        <th>Major</th>
-        <th>Professor</th>
-        <th>Rating</th>
-        <th>Review</th>
-        <th></th>
-        <th></th>
-      </tr>
-      [[for row in rows:]]
-      <tr>
-        <td>[[=row.courses.class_name]]</td>
-        <td>[[=row.courses.class_number]]</td>
-        <td>[[=row.courses.department]]</td>
-        <td>[[=row.reviews.teacher]]</td>
-        <td>[[=row.reviews.rating]]/5</td>
-        <td>[[=row.reviews.review]]</td>
 
-        <td>
-          <a class="button" href="[[=URL('edit_review', row.reviews.id)]]">
-            <span class="icon"><i class="fa fa-fw fa-pencil"></i></span> <span>Edit</span>
-          </a>
-        </td>
-        <td>
-          <a class="button" href="[[=URL('delete_review', row.reviews.id)]]">
-            <span class="icon"><i class="fa fa-fw fa-trash"></i></span>
-          </a>
-        </td>
-      </tr>
-      [[pass]]
-    </table>
+  <div v-for="r in reviews_list.slice().reverse()">
+        <div class="box">
+          <p class="has-text-right">
+              <a  v-if="!r.edit_new_review" class="button is-primary" @click="set_edit_status(true,r._idx)">
+                <span class="icon"><i class="fa fa-fw fa-pencil"></i></span> <span>Edit</span>
+                </a>
+              <a v-else class="button is-link" @click="stop_edit(r._idx)"><span>Save</span></a>
+           </p>
+           <div>
+               <b>{{r.courses.department}} {{r.courses.class_number}}:
+                   {{r.courses.class_name}}</b>
+
+           </div>
+            <br>
+
+
+            <div class="control"><b>Professor:</b> <span v-if="!r.edit_new_review">{{r.reviews.teacher}}</span>
+            <span v-else><input type="text" class="input" v-model="r.reviews.teacher"></span>
+            </div>
+                <br>
+                <div>
+                    <span v-if="!r.edit_new_review">{{r.reviews.review}}</span>
+                    <span v-else><textarea class="textarea" v-model="r.reviews.review"></textarea> </span>
+
+                </div>
+                <br>
+
+
+
+            <br>
+            <div>
+                <b>Overall Rating</b>
+                <span v-if="!r.edit_new_review" v-for="star_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="star_idx <= r.reviews.rating" class="fa fa-star" style="color: rgb(230,230,0);"></i>
+                  <i v-if="star_idx > r.reviews.rating" class="fa fa-star-o" style="color: rgb(230,230,0);"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="stars_out()">
+                <span @mouseover="stars_over(star_idx)"
+					  @click="set_stars(star_idx)">
+                  <i v-if="star_idx <= new_rating" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
+                  <i v-if="star_idx > new_rating" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
+                </span>
+    	   </span>
+                </span>
+            </div>
+            <div>
+                <b>Difficulty</b>
+                <span v-if="!r.edit_new_review" v-for="bomb_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="bomb_idx <= r.reviews.difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                  <i v-if="bomb_idx > r.reviews.difficulty" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="bombs_out()">
+                <span @mouseover="bombs_over(bomb_idx)"
+					  @click="set_bombs(bomb_idx)">
+                  <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                  <i v-if="bomb_idx > new_difficulty" class="far fa-angry"  style="color: rgb(255,77,77); font-size: 20px;"></i>
+                </span>
+    	   </span>
+                </span>
+            </div>
+            <div>
+                <b>Workload</b>
+                <span  v-if="!r.edit_new_review" v-for="plane_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="plane_idx <= r.reviews.workload" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                  <i v-if="plane_idx > r.reviews.workload" class="far fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="planes_out()">
+                <span @mouseover="planes_over(plane_idx)"
+					  @click="set_planes(plane_idx)">
+                  <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                  <i v-if="plane_idx > new_workload" class="far fa-paper-plane"  style="color: rgb(0,153,230)"></i>
+                </span>
+    	   </span>
+                </span>
+            </div>
+            <br>
+            <!-- Trying to get the author of each Review -->
+            <div class="is-size-6 has-text-grey"><i>by {{r.reviews.created_by_username}}</i></div>
+			<div class="is-size-6 has-text-grey"><i>created: {{r.reviews.created_time}}</i></div>
+          <p class="has-text-right has-text-danger is-size-4"><span class="icon"><i @click="delete_review(r._idx)" class="fa fa-fw fa-trash"></i></span></p>
+
+        </div>
+        <br>
   </div>
+</div>
+</div>
 
 
 
 </div>
+[[block page_scripts]]
+<!-- Loads the index-specific js for Vue -->
+<script>
+    let get_users_reviews_url = "[[=XML(get_users_reviews_url)]]";
+    let delete_review_url = "[[=XML(delete_review_url)]]";
+    let edit_review_url = "[[=XML(edit_review_url)]]";
+
+</script>
+<script src="js/users_reviews.js"></script>
+[[end]]

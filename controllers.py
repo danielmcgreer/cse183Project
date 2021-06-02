@@ -33,7 +33,7 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from .common import Field
 from pydal.validators import *
-from .models import get_user_email
+from .models import get_user_email, get_time
 from .models import get_username
 
 url_signer = URLSigner(session)
@@ -111,20 +111,7 @@ def add_review():
         redirect(URL('index'))
     return dict(form=form)
 
-@action('edit_review/<review_id:int>', method=["GET", "POST"])
-@action.uses(db, session, auth.user, 'edit_review.html')
-def edit(review_id=None):
-    assert review_id is not None
 
-    p = db.reviews[review_id]
-    if p is None:
-        redirect(URL('index'))
-    if p.created_by == auth.current_user.get('email'):
-        form = Form(db.reviews, record=p, deletable=False, csrf_session=session, formstyle=FormStyleBulma)
-    if form.accepted:
-        redirect(URL('users_reviews'))
-        
-    return dict(form=form)
 
 @action('delete_review')
 @action.uses(url_signer.verify(), db, session, auth.user)
@@ -219,6 +206,7 @@ def display_course(major_id=None, course_num=None):
         avg_difficulty = "N/A"
 
     return dict(get_reviews_url = URL('get_reviews'),
+                edit_review_url = URL('edit_review'),
                 submit_review_url = URL('submit_review'),
                 delete_review_url = URL('delete_review', signer=url_signer),
                 course_info=course_info, course_id=course_info.id, reviews=reviews,
@@ -243,23 +231,75 @@ def submit_review(course_id):
 
     return dict(created_by=created_by)
 
+@action('edit_review', method="POST")
+@action.uses(db)
+def edit_review():
+    # Updates the db record.
+    id = request.json.get("id")
+    teacher = request.json.get("teacher")
+    review = request.json.get("review")
+    rating = request.json.get("rating")
+    difficulty = request.json.get("difficulty")
+    workload = request.json.get("workload")
+    db(db.reviews.id == id).update(
+        teacher=teacher,
+        review=review,
+        rating=rating,
+        difficulty=difficulty,
+        workload=workload,
+        created_time=get_time(),
+
+    )
+    return "ok"
+
+
 
 @action('get_reviews/<course_id:int>')
 @action.uses(db)
 def get_reviews(course_id):
+    # grab all reviews with that course
+    reviews = db(db.reviews.course_id==course_id).select()
+    review_sum = 0
+    workload_sum = 0
+    difficulty_sum = 0
+    review_count = 0
     name=get_user_email()
     the_reviews = db(db.reviews.course_id == course_id).select().as_list()
-    return dict(the_reviews=the_reviews, name=name)
+
+    for review in reviews:
+        review_sum = review_sum + review.rating
+        workload_sum = workload_sum + review.workload
+        difficulty_sum = difficulty_sum + review.difficulty
+        review_count = review_count + 1
+
+    if (review_count != 0):
+        avg_review = round(review_sum / review_count, 1)
+        avg_workload = round(workload_sum / review_count, 1)
+        avg_difficulty = round(difficulty_sum / review_count, 1)
+    else:
+        avg_review = "N/A"
+        avg_workload = "N/A"
+        avg_difficulty = "N/A"
+    return dict(the_reviews=the_reviews, name=name,avg_review=avg_review, avg_difficulty=avg_difficulty,
+                avg_workload=avg_workload)
 
  
 @action('users_reviews')
 @action.uses(db, auth, 'users_reviews.html')
 def users_reviews():
 #TODO if args eq none then do something
-    rows = db((db.reviews.created_by == get_user_email()) &
-                (db.courses.id == db.reviews.course_id)).select()
-    return dict(rows=rows, url_signer=url_signer) 
-    
+    the_reviews = db((db.reviews.created_by == get_user_email()) &
+                (db.courses.id == db.reviews.course_id)).select().as_list()
+    return dict(the_reviews=the_reviews,delete_review_url = URL('delete_review', signer=url_signer),edit_review_url = URL('edit_review'), get_users_reviews_url = URL('get_users_reviews'), url_signer=url_signer)
+
+@action('get_users_reviews')
+@action.uses(db)
+def get_reviews():
+    the_reviews = db((db.reviews.created_by == get_user_email()) &
+                (db.courses.id == db.reviews.course_id)).select().as_list()
+    return dict(the_reviews=the_reviews)
+
+
 @action('search')
 @action.uses()
 def search():

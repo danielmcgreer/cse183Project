@@ -9,11 +9,31 @@
 <div class="section" id="vue-target" v-cloak>
 
   <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
-  
-	<div class="is-size-5">Average rating: [[=avg_review]]</div>
-	<div class="is-size-5">Average difficulty: [[=avg_difficulty]]</div>
-	<div class="is-size-5">Average workload: [[=avg_workload]]</div>
-  
+
+	<div class="is-size-5">Average rating:
+        <span v-if="avg_rating>0">
+        {{avg_rating}}/5
+        </span>
+        <span v-else>
+            N/A
+        </span>
+    </div>
+	<div class="is-size-5">Average difficulty:
+    <span v-if="avg_difficulty>0">
+        {{avg_difficulty}}/5
+        </span>
+        <span v-else>
+            N/A
+        </span>
+    </div>
+	<div class="is-size-5">Average workload:
+    <span v-if="avg_workload>0">
+        {{avg_workload}}/5
+        </span>
+        <span v-else>
+            N/A
+        </span>
+     </div>
     <br><br>
         <div class="box">
           <h3 class="title">
@@ -134,29 +154,67 @@
         <br><br>
         <div v-for="r in reviews_list.slice().reverse()">
         <div class="box">
-            <div><b>Professor:</b> {{r.teacher}}</div>
+            <p class="has-text-right">
+              <a  v-if="!r.edit_new_review & r.created_by==current_user" class="button is-primary" @click="set_edit_status(true,r._idx)">
+                <span class="icon"><i class="fa fa-fw fa-pencil"></i></span> <span>Edit</span>
+                </a>
+              <a v-if="r.edit_new_review&r.created_by==current_user" class="button is-link" @click="stop_edit(r._idx)"><span>Save</span></a>
+           </p>
+            <div><b>Professor:</b> <span v-if="!r.edit_new_review">{{r.teacher}}</span>
+            <span v-else><input type="text" class="input" v-model="r.teacher"></span>
+            </div>
             <br>
-            <div>{{r.review}}</div>
+            <div>
+                <span v-if="!r.edit_new_review">{{r.review}}</span>
+                <span v-else><textarea class="textarea" v-model="r.review"></textarea> </span>
+            </div>
             <br>
             <div>
                 <b>Overall Rating</b>
-                <span v-for="star_idx in [1, 2, 3, 4, 5]">
+                <span v-if="!r.edit_new_review" v-for="star_idx in [1, 2, 3, 4, 5]">
                   <i v-if="star_idx <= r.rating" class="fa fa-star" style="color: rgb(230,230,0);"></i>
                   <i v-if="star_idx > r.rating" class="fa fa-star-o" style="color: rgb(230,230,0);"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="stars_out()">
+                <span @mouseover="stars_over(star_idx)"
+					  @click="set_stars(star_idx)">
+                  <i v-if="star_idx <= new_rating" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
+                  <i v-if="star_idx > new_rating" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
+                </span>
+    	   </span>
                 </span>
             </div>
             <div>
                 <b>Difficulty</b>
-                <span v-for="bomb_idx in [1, 2, 3, 4, 5]">
-                  <i v-if="bomb_idx <= r.difficulty" class="fas fa-angry" style="color: rgb(255,77,77)"></i>
-                  <i v-if="bomb_idx > r.difficulty" class="far fa-angry" style="color: rgb(255,77,77)"></i>
+                <span v-if="!r.edit_new_review" v-for="bomb_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="bomb_idx <= r.difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                  <i v-if="bomb_idx > r.difficulty" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="bombs_out()">
+                <span @mouseover="bombs_over(bomb_idx)"
+					  @click="set_bombs(bomb_idx)">
+                  <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                  <i v-if="bomb_idx > new_difficulty" class="far fa-angry"  style="color: rgb(255,77,77); font-size: 20px;"></i>
+                </span>
+    	   </span>
                 </span>
             </div>
             <div>
                 <b>Workload</b>
-                <span v-for="plane_idx in [1, 2, 3, 4, 5]">
+                <span  v-if="!r.edit_new_review" v-for="plane_idx in [1, 2, 3, 4, 5]">
                   <i v-if="plane_idx <= r.workload" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
                   <i v-if="plane_idx > r.workload" class="far fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="planes_out()">
+                <span @mouseover="planes_over(plane_idx)"
+					  @click="set_planes(plane_idx)">
+                  <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                  <i v-if="plane_idx > new_workload" class="far fa-paper-plane"  style="color: rgb(0,153,230)"></i>
+                </span>
+    	   </span>
                 </span>
             </div>
             <br>
@@ -179,6 +237,7 @@
     let get_reviews_url = "[[=XML(get_reviews_url)]]";
     let submit_review_url = "[[=XML(submit_review_url)]]";
     let delete_review_url = "[[=XML(delete_review_url)]]";
+    let edit_review_url = "[[=XML(edit_review_url)]]";
 	let course_id = "[[=course_id]]";
 </script>
 <script src="js/display_course.js"></script>
