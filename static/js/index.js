@@ -29,8 +29,9 @@ let init = (app) => {
     };
 
     app.search = function () {
-        if (app.vue.query.length > 0) {
-            axios.get(search_url, {params: {q: app.vue.query}})
+        let query = app.vue.query;
+        if (query.length > 0) {
+            axios.get(search_url, {params: {q: query}})
                 .then(function (result) {
                     let results = result.data.results;
                     app.enumerate(results);
@@ -42,10 +43,33 @@ let init = (app) => {
         }
     }
 
+    app.submit = function () {
+
+        let query = app.vue.query;
+        if (query.length > 0) {
+
+            const router = new VueRouter({
+                routes: [
+                {
+                    path: 'display_courses/:major_id/:course_num',
+                    name: 'display_courses',
+                }
+                ]
+            })
+
+            axios.get(search_results_url, {params: {q: query}})
+                .then(function (result) {
+                    router.push({ name: 'display_courses', params: {major_id: result.data.department, course_num: result.data.numbers} })
+//                    window.location.href = 'display_courses/' + result.data.department + '/' + result.data.numbers;
+                });
+        }
+    }
+
     // This contains all the methods.
     app.methods = {
         // Complete as you see fit.
         search: app.search,
+        submit: app.submit,
     };
 
     // This creates the Vue instance.

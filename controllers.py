@@ -44,7 +44,11 @@ url_signer = URLSigner(session)
 def index():
     #Grabs reviews and associated courses
     reviews = db(db.reviews.course_id == db.courses.id).select()
-    return dict(search_url=URL('search', signer=url_signer), reviews=reviews, url_signer=url_signer)
+    return dict(search_url=URL('search', signer=url_signer),
+                search_results_url=URL('search_results', signer=url_signer),
+                reviews=reviews,
+                url_signer=url_signer)
+
 
 @action('add_course', method=["GET", "POST"])
 @action.uses(db, session, auth.user, 'add_course.html')
@@ -136,7 +140,7 @@ def search_course():
                 )
     #TODO if it is not accepted
     if form.accepted:
-        redirect(URL('display_courses',form.vars["department"] ,form.vars["class_number"] ))
+        redirect(URL('display_courses', form.vars["department"], form.vars["class_number"]))
 
     return dict(form=form)
 
@@ -160,14 +164,14 @@ def display_courses(major_id=None, course_num=None):
 @action('display_course/<major_id>/<course_num:int>')
 @action.uses(db, auth, 'display_course.html')
 def display_course(major_id=None, course_num=None):
-#TODO if args eq none then do something
+# TODO if args eq none then do something
     if(course_num==None):
         course_num=0
 
-    #grab matching course
+    # grab matching course
     course_info = db((db.courses.department == major_id) & (db.courses.class_number == course_num)).select().first()
 
-    #grab all reviews with that course
+    # grab all reviews with that course
     reviews = db((db.reviews.course_id == course_info.id)).select()
 
     return dict(get_reviews_url = URL('get_reviews'),
@@ -192,8 +196,7 @@ def submit_review(course_id):
 @action('get_reviews/<course_id:int>')
 @action.uses(db)
 def get_reviews(course_id):
-    name=get_user_email()
-    print(name)
+    name = get_user_email()
     the_reviews = db(db.reviews.course_id == course_id).select().as_list()
     return dict(the_reviews=the_reviews, name=name)
 
@@ -205,25 +208,60 @@ def users_reviews():
     rows = db((db.reviews.created_by == get_user_email()) &
                 (db.courses.id == db.reviews.course_id)).select()
     return dict(rows=rows, url_signer=url_signer) 
-    
+
+
 @action('search')
 @action.uses()
 def search():
     q = request.params.get("q")
-    query = q +"%"
 
-    numbers = []
+    numbers = ""
+    letters = ""
+    first = True
 
     for word in q.split():
         if word.isdigit():
-            numbers.append(int(word))
-    # TODO: do something with numbers so you can have a better search system
+            numbers += word
+        else:
+            if first:
+                letters += word
+                first = False
+            else:
+                letters = letters + " " + word
 
-    results = db((db.courses.class_name.like(query)) |
-                 (db.courses.department.like(query)) |
-                 (db.courses.class_number.like(query))).select().as_list()
+    if len(numbers) > 0:
+        numbers = numbers + "%"
+    if len(letters) > 0:
+        letters = letters + "%"
+
+    results = db((db.courses.class_name.like(letters)) |
+                 (db.courses.department.like(letters)) |
+                 (db.courses.class_number.like(numbers))).select().as_list()
 
     return dict(results=results)
+
+
+@action('search_results')
+@action.uses()
+def search_results():
+    q = request.params.get("q")
+
+    numbers = "00"
+    department = "null"
+
+    for word in q.split():
+        if word.isdigit():
+            numbers = word
+            break
+        else:
+            if (len(word) == 3) or (len(word) == 4):
+                department = word
+                break
+
+    # redirect(URL('display_courses', department, numbers))
+    newNumbers = int(numbers)
+
+    return dict(numbers=newNumbers, department=department)
 
 
 @action('write_review/<course_id>', method=["GET", "POST"])
@@ -258,5 +296,4 @@ def write_review(course_id):
                          course_id = course.id)
         redirect(URL('index'))
     return dict(form=form)
-    
     
