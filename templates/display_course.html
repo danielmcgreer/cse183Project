@@ -6,10 +6,10 @@
 }
 </style>
 
-<div class="section" id="vue-target" v-cloak>
+<div class="section" id="vue-target" style="padding: 100px;" v-cloak>
     
     <div class="box">
-      <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
+      <h1 class="title is-2">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
       
       <br>
 
@@ -56,13 +56,17 @@
     </div>
     <br><br>
   
+  <!--
   <a class="button is-link" href="[[=URL('search_course')]]">
     <span>Search Another Course</span>
   </a>
+  -->
   
-  <a class="button is-warning" href="[[=URL('index')]]">
-    <span>Back to Main Page</span>
-  </a>
+  <div align="right">
+      <a class="button is-warning" href="[[=URL('index')]]">
+        <span>Back to Main Page</span>
+      </a>
+  </div>
   
   <!-- Vue Form -->
 	<div v-if="adding_new_review" class="field">
