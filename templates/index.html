@@ -12,17 +12,34 @@
 
 <div class="section" id="vue-target" v-cloak>
   <div class="control block" style="display: flex;">
-    <i class="fa fa-search icon is-medium" style="margin-top: 10px;" aria-hidden="true"></i>
-    <input placeholder="search for a class using keywords..." class="input" type="text" v-model="query" @keyup="search" />
+<!--    <i class="fa fa-search icon is-medium" style="margin-top: 10px;" aria-hidden="true"></i>-->
+    <div class="field has-addons">
+      <p class="control">
+        <input placeholder="search for a class using keywords..." class="input" type="text" v-model="query" @keyup="search" @keyup.13="submit"/>
+      </p>
+      <p class="control">
+        <button class="button is-link" @click="submit">
+          <span class="icon is-small mx-2">
+            <i class="fa fa-search" aria-hidden="true"></i>
+          </span>
+        </button>
+      </p>
+    </div>
   </div>
 
-<span v-for="r in results">
-     <a v-bind:href="r.link_display_course">{{r.department}} {{r.class_number}} {{r.class_name}}</a>
-	 <br>
-	</span>
+  <div class="dropdown is-active">
+    <div class="dropdown-content">
+      <span v-for="r in results">
+        <a v-bind:href="r.link_display_course" class="dropdown-item has-text-link">{{r.department}} {{r.class_number}}, {{r.class_name}}</a>
+    <!--    <br>-->
+      </span>
+    </div>
+  </div>
+</div>
 </div>
 
-  <h2 class="title" style="display: flex; justify-content: center;">Browse Reviews</h2>
+
+<!--  <h2 class="title" style="display: flex; justify-content: center;">Browse Reviews</h2>-->
     
   <!--
   <a class="button is-success" href="[[=URL('add_review')]]">
@@ -31,38 +48,38 @@
   </a>
   -->
   
-  <a class="button is-success" href="[[=URL('search_course')]]">
-    <span>Search Course by ID</span>
-  </a>
-  
-  <br>
+<!--  <a class="button is-success" href="[[=URL('search_course')]]">-->
+<!--    <span>Search Course by ID</span>-->
+<!--  </a>-->
+<!--  -->
+<!--  <br>-->
 
-  <div class="container">
-    <table class="table is-striped is-fullwidth">
-      <tr>
-        <th>Department</th>
-        <th>Number</th>
-        <th>Class Name</th>
-        <th>Teacher</th>
-        <th>Rating</th>
-        <th>Review</th>
-        <th></th>
-        <th></th>
-      </tr>
-      [[for review in reviews:]]
-      <tr>
-        <td>[[=review.courses.department]]</td>
-        <td>[[=review.courses.class_number]]</td>
-        <td>[[=review.courses.class_name]]</td>
-        <td>[[=review.reviews.teacher]]</td>
-        <td>[[=review.reviews.rating]]/5</td>
-        <td>[[=review.reviews.review]]</td>
+<!--  <div class="container">-->
+<!--    <table class="table is-striped is-fullwidth">-->
+<!--      <tr>-->
+<!--        <th>Department</th>-->
+<!--        <th>Number</th>-->
+<!--        <th>Class Name</th>-->
+<!--        <th>Teacher</th>-->
+<!--        <th>Rating</th>-->
+<!--        <th>Review</th>-->
+<!--        <th></th>-->
+<!--        <th></th>-->
+<!--      </tr>-->
+<!--      [[for review in reviews:]]-->
+<!--      <tr>-->
+<!--        <td>[[=review.courses.department]]</td>-->
+<!--        <td>[[=review.courses.class_number]]</td>-->
+<!--        <td>[[=review.courses.class_name]]</td>-->
+<!--        <td>[[=review.reviews.teacher]]</td>-->
+<!--        <td>[[=review.reviews.rating]]/5</td>-->
+<!--        <td>[[=review.reviews.review]]</td>-->
 
-      </tr>
-      [[pass]]
-    </table>
-  </div>
-</div>
+<!--      </tr>-->
+<!--      [[pass]]-->
+<!--    </table>-->
+<!--  </div>-->
+<!--</div>-->
 
 
 [[block page_scripts]]
@@ -72,3 +89,4 @@
 </script>
 <script src="js/index.js"></script>
 [[end]]
+

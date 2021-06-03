@@ -36,6 +36,8 @@ from pydal.validators import *
 from .models import get_user_email, get_time
 from .models import get_username
 
+from urllib.parse import unquote
+
 url_signer = URLSigner(session)
 #TODO make signing everywhere and make sure you can only mess with your own reviews
 #TODO you can only write reviews for courses that exist, if course does not exist 
@@ -45,7 +47,11 @@ url_signer = URLSigner(session)
 def index():
     #Grabs reviews and associated courses
     reviews = db(db.reviews.course_id == db.courses.id).select()
-    return dict(search_url=URL('search', signer=url_signer), reviews=reviews, url_signer=url_signer)
+    return dict(search_url=URL('search', signer=url_signer),
+                # search_results_url=URL('search_results', signer=url_signer),
+                reviews=reviews,
+                url_signer=url_signer)
+
 
 @action('add_course', method=["GET", "POST"])
 @action.uses(db, session, auth.user, 'add_course.html')
@@ -121,6 +127,7 @@ def delete():
     db(db.reviews.id == review_id).delete()
     redirect(URL('users_reviews'))
 
+# retired page
 @action('search_course', method=["GET", "POST"])
 @action.uses(db, auth, 'search_course.html')
 def search_course():
@@ -129,26 +136,58 @@ def search_course():
                 )
     #TODO if it is not accepted
     if form.accepted:
-        redirect(URL('display_courses',form.vars["department"] ,form.vars["class_number"] ))
+        redirect(URL('display_courses', form.vars["department"], form.vars["class_number"]))
 
     return dict(form=form)
 
-@action('display_courses/<major_id>/<course_num:int>')
+# @action('display_courses/<major_id>/<course_num:int>')
+# @action.uses(db, auth, 'display_courses.html')
+# def display_courses(major_id=None, course_num=None):
+# #TODO if args eq none then do something
+#     if(course_num==None):
+#         course_num=0
+#     perfectMatches = db((db.courses.department == major_id) &
+#                         (db.courses.class_number == course_num)).select()
+#     closeMatches1 = db((db.courses.department == major_id) &
+#                         (db.courses.class_number != course_num)).select()
+#     closeMatches2 = db((db.courses.department != major_id) &
+#                         (db.courses.class_number == course_num)).select()
+#
+#     allMatches = perfectMatches+closeMatches1+closeMatches2
+#     return dict(allMatches=allMatches, url_signer=url_signer)
+
+
+@action('display_courses/<search_string>')
 @action.uses(db, auth, 'display_courses.html')
-def display_courses(major_id=None, course_num=None):
+def display_courses(search_string=None):
     #TODO if args eq none then do something
-    if(course_num==None):
-        course_num=0
-        
-    perfectMatches = db((db.courses.department == major_id) &
-                        (db.courses.class_number == course_num)).select()
-    closeMatches1 = db((db.courses.department == major_id) &
-                        (db.courses.class_number != course_num)).select()
-    closeMatches2 = db((db.courses.department != major_id) &
-                        (db.courses.class_number == course_num)).select()
+
+    search_string = unquote(search_string)
+
+    numbers = ""
+    letters = ""
+    first = True
+
+    for word in search_string.split():
+        if word.isdigit():
+            numbers += word
+        else:
+            if first:
+                letters += word
+                first = False
+            else:
+                letters = letters + " " + word
+
+    if len(numbers) > 0:
+        numbers = numbers + "%"
+    if len(letters) > 0:
+        letters = letters + "%"
+
+    allMatches = db((db.courses.class_name.like(letters)) |
+                 (db.courses.department.like(letters)) |
+                 (db.courses.class_number.like(numbers))).select()
        
-    allMatches = perfectMatches+closeMatches1+closeMatches2
-       
+      
     for match in allMatches:
         reviews = db(db.reviews.course_id == match.id).select()
         review_sum = 0
@@ -176,14 +215,14 @@ def display_courses(major_id=None, course_num=None):
 @action('display_course/<major_id>/<course_num:int>')
 @action.uses(db, auth, 'display_course.html')
 def display_course(major_id=None, course_num=None):
-#TODO if args eq none then do something
+# TODO if args eq none then do something
     if(course_num==None):
         course_num=0
 
-    #grab matching course
+    # grab matching course
     course_info = db((db.courses.department == major_id) & (db.courses.class_number == course_num)).select().first()
 
-    #grab all reviews with that course
+    # grab all reviews with that course
     reviews = db((db.reviews.course_id == course_info.id)).select()
     
     review_sum = 0
@@ -257,6 +296,7 @@ def edit_review():
 @action('get_reviews/<course_id:int>')
 @action.uses(db)
 def get_reviews(course_id):
+
     # grab all reviews with that course
     reviews = db(db.reviews.course_id==course_id).select()
     review_sum = 0
@@ -264,6 +304,7 @@ def get_reviews(course_id):
     difficulty_sum = 0
     review_count = 0
     name=get_user_email()
+
     the_reviews = db(db.reviews.course_id == course_id).select().as_list()
 
     for review in reviews:
@@ -288,6 +329,7 @@ def get_reviews(course_id):
 @action.uses(db, auth, 'users_reviews.html')
 def users_reviews():
 #TODO if args eq none then do something
+
     the_reviews = db((db.reviews.created_by == get_user_email()) &
                 (db.courses.id == db.reviews.course_id)).select().as_list()
     return dict(the_reviews=the_reviews,delete_review_url = URL('delete_review', signer=url_signer),edit_review_url = URL('edit_review'), get_users_reviews_url = URL('get_users_reviews'), url_signer=url_signer)
@@ -304,20 +346,52 @@ def get_reviews():
 @action.uses()
 def search():
     q = request.params.get("q")
-    query = q +"%"
 
-    numbers = []
+    numbers = ""
+    letters = ""
+    first = True
 
     for word in q.split():
         if word.isdigit():
-            numbers.append(int(word))
-    # TODO: do something with numbers so you can have a better search system
+            numbers += word
+        else:
+            if first:
+                letters += word
+                first = False
+            else:
+                letters = letters + " " + word
 
-    results = db((db.courses.class_name.like(query)) |
-                 (db.courses.department.like(query)) |
-                 (db.courses.class_number.like(query))).select().as_list()
+    if len(numbers) > 0:
+        numbers = numbers + "%"
+    if len(letters) > 0:
+        letters = letters + "%"
+
+    results = db((db.courses.class_name.like(letters)) |
+                 (db.courses.department.like(letters)) |
+                 (db.courses.class_number.like(numbers))).select().as_list()
 
     return dict(results=results)
+
+
+# @action('search_results')
+# @action.uses()
+# def search_results():
+#     q = request.params.get("q")
+#
+#     numbers = "00"
+#     department = "null"
+#
+#     for word in q.split():
+#         if word.isdigit():
+#             numbers = word
+#         else:
+#             if (len(word) == 3) or (len(word) == 4):
+#                 department = word
+#
+#     newNumbers = int(numbers)
+#     department = department.upper()
+#
+#     return dict(numbers=newNumbers, department=department)
 
 
 @action('write_review/<course_id>', method=["GET", "POST"])
@@ -356,5 +430,4 @@ def write_review(course_id):
                          course_id = course.id)
         redirect(URL('index'))
     return dict(form=form)
-    
     
