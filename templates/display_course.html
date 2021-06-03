@@ -7,42 +7,53 @@
 </style>
 
 <div class="section" id="vue-target" v-cloak>
+    
+    <div class="box">
+      <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
+      
+      <br>
 
-  <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
-
-	<div class="is-size-5">Average rating:
-        <span v-if="avg_rating>0">
-        {{avg_rating}}/5
-        </span>
-        <span v-else>
-            N/A
-        </span>
-    </div>
-	<div class="is-size-5">Average difficulty:
-    <span v-if="avg_difficulty>0">
-        {{avg_difficulty}}/5
-        </span>
-        <span v-else>
-            N/A
-        </span>
-    </div>
-	<div class="is-size-5">Average workload:
-    <span v-if="avg_workload>0">
-        {{avg_workload}}/5
-        </span>
-        <span v-else>
-            N/A
-        </span>
-     </div>
-    <br><br>
-        <div class="box">
-          <h3 class="title">
-                Course Description
-          </h3>
-          <div>
-              [[=course_info.class_description]]
-          </div>
+      <div style="display: flex; justify-content: space-between">
+    	<div class="is-size-5"><b>Average rating:</b>
+            <span v-if="avg_rating>0">
+            {{avg_rating}}/5
+            </span>
+            <span v-else>
+                N/A
+            </span>
+            <i class="fa fa-star" style="color: rgb(230,230,0);"></i>
         </div>
+        
+    	<div class="is-size-5"><b>Average difficulty:</b>
+        <span v-if="avg_difficulty>0">
+            {{avg_difficulty}}/5
+            </span>
+            <span v-else>
+                N/A
+            </span>
+            <i class="fas fa-angry" style="color: rgb(255,77,77)"></i>
+        </div>
+        
+    	<div class="is-size-5"><b>Average workload:</b>
+            <span v-if="avg_workload>0">
+            {{avg_workload}}/5
+            </span>
+            <span v-else>
+                N/A
+            </span>
+            <i class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+        </div>
+        
+      </div>
+        <br><br>
+        <h3 class="title">
+            Course Description
+        </h3>
+        <div>
+          [[=course_info.class_description]]
+        </div>
+        <br><br>
+    </div>
     <br><br>
   
   <a class="button is-link" href="[[=URL('search_course')]]">
@@ -65,7 +76,7 @@
 	  </p>
 	</div>
 	<div v-if="no_teacher_warning" class="field">
-		<span style="color:red"> Teacher feild must not be blank </span>
+		<span style="color:red"> Teacher field must not be blank </span>
 	</div>
 	<div class="field">
 	  <p class="control">
