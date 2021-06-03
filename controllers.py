@@ -33,7 +33,8 @@ from .models import get_user_email
 from py4web.utils.form import Form, FormStyleBulma
 from .common import Field
 from pydal.validators import *
-from .models import get_user_email
+from .models import get_user_email, get_time
+from .models import get_username
 
 from urllib.parse import unquote
 
@@ -61,23 +62,23 @@ def add_course():
                 Field('class_name', requires=IS_NOT_EMPTY()),
                 Field('class_description', 'text', requires=IS_NOT_EMPTY())],
                 csrf_session=session, formstyle=FormStyleBulma)
-    
+
     # if form is accepted
     if form.accepted:
         # Check if there is a course that already exists with the entered info
-        if db((db.courses.department == form.vars["department"]) &
-              (db.courses.class_number == form.vars["class_number"]) &
-              (db.courses.class_name == form.vars["class_name"]) &
-              (db.courses.class_description == form.vars["class_description"])).select().first() == None:
+        if db((db.courses.department == form.vars["department"].upper()) &
+              (db.courses.class_number == form.vars["class_number"])).select().first() == None:
               # If there is no course with the inputted info then create the course by inserting its info into the courses table
-              db.courses.insert(department = form.vars["department"],
+              db.courses.insert(department = form.vars["department"].upper(),
                                 class_number = form.vars["class_number"],
                                 class_name = form.vars["class_name"],
                                 class_description = form.vars["class_description"])
-        redirect(URL('index'))
+        
+        redirect(URL('display_course', form.vars["department"].upper(), form.vars["class_number"]))        
+        
     return dict(form=form)
-  
-    
+
+
 @action('add_review', method=["GET", "POST"])
 @action.uses(db, session, auth.user, 'add_review.html')
 def add_review():
@@ -85,11 +86,13 @@ def add_review():
     form = Form([Field('department', requires=IS_NOT_EMPTY()),
                 Field('class_number',  'integer', requires=IS_NOT_EMPTY()),
                 Field('class_name', requires=IS_NOT_EMPTY()),
-                Field('teacher',),
-                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
+                Field('teacher', requires=IS_NOT_EMPTY()),
+                Field('rating', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
+                Field('workload', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
+                Field('diffuculty', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
                 Field('review', 'text')],
                 csrf_session=session, formstyle=FormStyleBulma)
-    
+
     # if form is accepted
     if form.accepted:
         # Check if there is a course that already exists with the entered info
@@ -107,25 +110,15 @@ def add_review():
         # insert the review into the reviews table
         db.reviews.insert(teacher = form.vars["teacher"],
                          rating = form.vars["rating"],
-                         review = form.vars["review"], 
+                         workload = form.vars["workload"],
+                         difficulty = form.vars["difficulty"],
+                         review = form.vars["review"],
                          course_id = course.id)
         redirect(URL('index'))
     return dict(form=form)
-    
-@action('edit_review/<review_id:int>', method=["GET", "POST"])
-@action.uses(db, session, auth.user, 'edit_review.html')
-def edit(review_id=None):
-    assert review_id is not None
 
-    p = db.reviews[review_id]
-    if p is None:
-        redirect(URL('index'))
-    if p.created_by == auth.current_user.get('email'):
-        form = Form(db.reviews, record=p, deletable=False, csrf_session=session, formstyle=FormStyleBulma)
-    if form.accepted:
-        redirect(URL('index'))
-    return dict(form=form)
-    
+
+
 @action('delete_review')
 @action.uses(url_signer.verify(), db, session, auth.user)
 def delete():
@@ -190,11 +183,33 @@ def display_courses(search_string=None):
     if len(letters) > 0:
         letters = letters + "%"
 
-    results = db((db.courses.class_name.like(letters)) |
+    allMatches = db((db.courses.class_name.like(letters)) |
                  (db.courses.department.like(letters)) |
                  (db.courses.class_number.like(numbers))).select()
+       
+      
+    for match in allMatches:
+        reviews = db(db.reviews.course_id == match.id).select()
+        review_sum = 0
+        workload_sum = 0
+        difficulty_sum = 0
+        review_count= 0
+        for review in reviews:
+            review_sum = review_sum+review.rating
+            workload_sum = workload_sum+review.workload
+            difficulty_sum = difficulty_sum+review.difficulty
+            review_count = review_count+1
 
-    return dict(allMatches=results, url_signer=url_signer)
+        if(review_count != 0):
+            match["avg_review"] = round(review_sum/review_count, 1)
+            match["avg_workload"] = round(workload_sum/review_count, 1)
+            match["avg_difficulty"] = round(difficulty_sum/review_count, 1)
+        else:
+            match["avg_review"] = "N/A"
+            match["avg_workload"] = "N/A"
+            match["avg_difficulty"] = "N/A"
+
+    return dict(allMatches=allMatches, url_signer=url_signer)
 
 
 @action('display_course/<major_id>/<course_num:int>')
@@ -209,11 +224,33 @@ def display_course(major_id=None, course_num=None):
 
     # grab all reviews with that course
     reviews = db((db.reviews.course_id == course_info.id)).select()
+    
+    review_sum = 0
+    workload_sum = 0
+    difficulty_sum = 0
+    review_count= 0
+    for review in reviews:
+        review_sum = review_sum+review.rating
+        workload_sum = workload_sum+review.workload
+        difficulty_sum = difficulty_sum+review.difficulty
+        review_count = review_count+1
+
+    if(review_count != 0):
+        avg_review = round(review_sum/review_count, 1)
+        avg_workload = round(workload_sum/review_count, 1)
+        avg_difficulty = round(difficulty_sum/review_count, 1)
+    else:
+        avg_review = "N/A"
+        avg_workload = "N/A"
+        avg_difficulty = "N/A"
 
     return dict(get_reviews_url = URL('get_reviews'),
+                edit_review_url = URL('edit_review'),
                 submit_review_url = URL('submit_review'),
                 delete_review_url = URL('delete_review', signer=url_signer),
-                course_info=course_info, course_id=course_info.id, reviews=reviews, url_signer=url_signer)
+                course_info=course_info, course_id=course_info.id, reviews=reviews,
+                url_signer=url_signer, avg_review=avg_review, avg_difficulty=avg_difficulty,
+                avg_workload=avg_workload)
 
 
 @action('submit_review/<course_id:int>', method="POST")
@@ -221,29 +258,88 @@ def display_course(major_id=None, course_num=None):
 def submit_review(course_id):
     db.reviews.insert(
         course_id=course_id,
+        created_by = get_user_email(),
+        created_by_username = get_username(),
         teacher=request.json.get('teacher'),
         rating = request.json.get('rating'),
+        workload = request.json.get('workload'),
+        difficulty = request.json.get('difficulty'),
         review=request.json.get('review'),
     )
-    created_by=get_user_email()
+    created_by = get_user_email()
+
     return dict(created_by=created_by)
+
+@action('edit_review', method="POST")
+@action.uses(db)
+def edit_review():
+    # Updates the db record.
+    id = request.json.get("id")
+    teacher = request.json.get("teacher")
+    review = request.json.get("review")
+    rating = request.json.get("rating")
+    difficulty = request.json.get("difficulty")
+    workload = request.json.get("workload")
+    db(db.reviews.id == id).update(
+        teacher=teacher,
+        review=review,
+        rating=rating,
+        difficulty=difficulty,
+        workload=workload,
+        created_time=get_time(),
+
+    )
+    return "ok"
+
 
 
 @action('get_reviews/<course_id:int>')
 @action.uses(db)
 def get_reviews(course_id):
-    name = get_user_email()
+
+    # grab all reviews with that course
+    reviews = db(db.reviews.course_id==course_id).select()
+    review_sum = 0
+    workload_sum = 0
+    difficulty_sum = 0
+    review_count = 0
+    name=get_user_email()
+
     the_reviews = db(db.reviews.course_id == course_id).select().as_list()
-    return dict(the_reviews=the_reviews, name=name)
+
+    for review in reviews:
+        review_sum = review_sum + review.rating
+        workload_sum = workload_sum + review.workload
+        difficulty_sum = difficulty_sum + review.difficulty
+        review_count = review_count + 1
+
+    if (review_count != 0):
+        avg_review = round(review_sum / review_count, 1)
+        avg_workload = round(workload_sum / review_count, 1)
+        avg_difficulty = round(difficulty_sum / review_count, 1)
+    else:
+        avg_review = "N/A"
+        avg_workload = "N/A"
+        avg_difficulty = "N/A"
+    return dict(the_reviews=the_reviews, name=name,avg_review=avg_review, avg_difficulty=avg_difficulty,
+                avg_workload=avg_workload)
 
  
 @action('users_reviews')
 @action.uses(db, auth, 'users_reviews.html')
 def users_reviews():
 #TODO if args eq none then do something
-    rows = db((db.reviews.created_by == get_user_email()) &
-                (db.courses.id == db.reviews.course_id)).select()
-    return dict(rows=rows, url_signer=url_signer) 
+
+    the_reviews = db((db.reviews.created_by == get_user_email()) &
+                (db.courses.id == db.reviews.course_id)).select().as_list()
+    return dict(the_reviews=the_reviews,delete_review_url = URL('delete_review', signer=url_signer),edit_review_url = URL('edit_review'), get_users_reviews_url = URL('get_users_reviews'), url_signer=url_signer)
+
+@action('get_users_reviews')
+@action.uses(db)
+def get_reviews():
+    the_reviews = db((db.reviews.created_by == get_user_email()) &
+                (db.courses.id == db.reviews.course_id)).select().as_list()
+    return dict(the_reviews=the_reviews)
 
 
 @action('search')
@@ -303,7 +399,9 @@ def search():
 def write_review(course_id):
     #Create a form for all fields for now
     form = Form([Field('teacher',),
-                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5)),
+                Field('rating', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
+                Field('workload', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
+                Field('difficulty', 'integer',IS_INT_IN_RANGE(0, 5), requires=IS_NOT_EMPTY()),
                 Field('review', 'text')],
                 csrf_session=session, formstyle=FormStyleBulma)
                 
@@ -326,6 +424,8 @@ def write_review(course_id):
         # insert the review into the reviews table
         db.reviews.insert(teacher = form.vars["teacher"],
                          rating = form.vars["rating"],
+                         workload = form.vars["workload"],
+                         difficulty = form.vars["difficulty"],
                          review = form.vars["review"], 
                          course_id = course.id)
         redirect(URL('index'))

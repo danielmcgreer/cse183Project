@@ -7,72 +7,239 @@
 </style>
 
 <div class="section" id="vue-target" v-cloak>
+    
+    <div class="box">
+      <h1 class="title">[[=course_info.department]] [[=course_info.class_number]]: [[=course_info.class_name]] </h1>
+      
+      <br>
 
-  <h1 class="title">Course Reviews for [[=course_info.department]] [[=course_info.class_number]] [[=course_info.class_name]] </h1>
+      <div style="display: flex; justify-content: space-between">
+    	<div class="is-size-5"><b>Average rating:</b>
+            <span v-if="avg_rating>0">
+            {{avg_rating}}/5
+            </span>
+            <span v-else>
+                N/A
+            </span>
+            <i class="fa fa-star" style="color: rgb(230,230,0);"></i>
+        </div>
+        
+    	<div class="is-size-5"><b>Average difficulty:</b>
+        <span v-if="avg_difficulty>0">
+            {{avg_difficulty}}/5
+            </span>
+            <span v-else>
+                N/A
+            </span>
+            <i class="fas fa-angry" style="color: rgb(255,77,77)"></i>
+        </div>
+        
+    	<div class="is-size-5"><b>Average workload:</b>
+            <span v-if="avg_workload>0">
+            {{avg_workload}}/5
+            </span>
+            <span v-else>
+                N/A
+            </span>
+            <i class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+        </div>
+        
+      </div>
+        <br><br>
+        <h3 class="title">
+            Course Description
+        </h3>
+        <div>
+          [[=course_info.class_description]]
+        </div>
+        <br><br>
+    </div>
+    <br><br>
   
-  <a class="button is-success" href="[[=URL('search_course')]]">
+  <a class="button is-link" href="[[=URL('search_course')]]">
     <span>Search Another Course</span>
   </a>
   
-  <a class="button is-success" href="[[=URL('index')]]">
+  <a class="button is-warning" href="[[=URL('index')]]">
     <span>Back to Main Page</span>
   </a>
   
-  <a class="button is-success" @click="set_add_status(true)">
-	<span>Write a Review</span>
-  </a>
-  
+  <!-- Vue Form -->
 	<div v-if="adding_new_review" class="field">
 	<div class="form">
 	<div class="field">
 	  <p class="control">
-		<textarea class="text" placeholder="e.g. Hello world!" rows="3" v-model="new_teacher"></textarea>
+	    <br>  
+        <label for="teacher" style="font-size: 20px;"><b>Professor Name</b></label> 
+        <br>
+		<input class="textarea is-primary" placeholder="Professor Name..." rows="3" v-model="new_teacher">
 	  </p>
 	</div>
-	<div class="field">
-	   <select v-model="new_rating">
-		  <option disabled value="">Please select one</option>
-		  <option value="1">One Star</option>
-		  <option value="2">Two Star</option>
-		  <option value="3">Three Star</option>
-		  <option value="4">Four Star</option>
-		  <option value="5">Five Star</option>
-		</select>
+	<div v-if="no_teacher_warning" class="field">
+		<span style="color:red"> Teacher field must not be blank </span>
 	</div>
 	<div class="field">
 	  <p class="control">
-		<textarea class="textarea" placeholder="e.g. Hello world!" rows="3" v-model="new_review"></textarea>
+	    <label for="review" style="font-size: 20px;"><b>Write a Review</b></label>   
+		<textarea class="textarea is-primary" placeholder="Write a review..." rows="3" v-model="new_review"></textarea>
 	  </p>
 	</div>
+	
+	<div v-if="no_review_warning" class="field">
+		<span style="color:red"> Please write something as a review </span>
+	</div>
+	
+	<div class="field">
+	   <label for="rating" style="font-size: 18px;"><b>Overall Class Rating</b></label>
+	   <br>
+	   <div class="box">
+    	   <span @mouseout="stars_out()">
+                <span @mouseover="stars_over(star_idx)"
+					  @click="set_stars(star_idx)"
+                      v-for="star_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="star_idx <= new_rating" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
+                  <i v-if="star_idx > new_rating" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
+                </span>
+    	   </span>
+	   </div>
+	</div>
+	
+	<div v-if="no_rating_warning" class="field">
+		<span style="color:red"> Please rate the course </span>
+	</div>
+	
+	<div class="field">
+	   <label for="rating" style="font-size: 18px;"><b>Class Difficulty Rating</b></label>
+	   <br>
+	   <div class="box">
+    	   <span @mouseout="bombs_out()">
+                    <span @mouseover="bombs_over(bomb_idx)"
+    					  @click="set_bombs(bomb_idx)"
+                          v-for="bomb_idx in [1, 2, 3, 4, 5]">
+                      <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                      <i v-if="bomb_idx > new_difficulty" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                    </span>
+    	   </span>
+	   </div>
+	</div>
+	
+	<div v-if="no_difficulty_warning" class="field">
+		<span style="color:red"> Please mark the difficulty for the course </span>
+	</div>
+	
+	<div class="field">
+	   <label for="rating" style="font-size: 18px;"><b>Class Workload Rating</b></label>
+	   <br>
+	   <div class="box">
+    	   <span @mouseout="planes_out()">
+                    <span @mouseover="planes_over(plane_idx)"
+    					  @click="set_planes(plane_idx)"
+                          v-for="plane_idx in [1, 2, 3, 4, 5]">
+                      <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
+                      <i v-if="plane_idx > new_workload" class="far fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
+                    </span>
+    	   </span>
+	   </div>
+	</div>
+	
+	<div v-if="no_workload_warning" class="field">
+		<span style="color:red"> Please mark the workload for the course </span>
+	</div>
+	
 	  <button class="button is-primary" @click="submit_review" >Submit Review</button>
 	  <button class="button is-warning" @click="set_add_status(false)" >Cancel</button>
 	</div>
 	</div>
 	
-	
   <div id="reviews_list" class="container">
-    <table class="table is-striped is-fullwidth">
-      <tr>
-        <th>Teacher</th>
-        <th>Rating</th>
-        <th>Review</th>
-      </tr>
-      <tr v-for="r in reviews_list.slice().reverse()">
-        <td>{{r.teacher}}</td>
-        <td>{{r.rating}}</td>
-        <td>{{r.review}}</td>
-		<td>
-		<div v-if="r.created_by==current_user">
-			<p class="has-text-right has-text-danger is-size-4"><span class="icon"><i @click="delete_review(r._idx)" class="fa fa-fw fa-trash"></i></span></p>
+        <br><br>
+        <h2 class="title">
+            [[=course_info.department]] [[=course_info.class_number]] Reviews 
+        </h2>
+        <a  v-if="!adding_new_review" class="button is-primary" @click="set_add_status(true)">
+            <span>Write a Review</span>
+        </a>
+		<div v-if="not_logged_in_wanring" class="field">
+			<span style="color:red"> Please log in to write a review </span>
 		</div>
-		</td>
-      </tr>
-	  [[pass]]
-
-    </table>
+        <br><br>
+        <div v-for="r in reviews_list.slice().reverse()">
+        <div class="box">
+            <p class="has-text-right">
+              <a  v-if="!r.edit_new_review & r.created_by==current_user" class="button is-primary" @click="set_edit_status(true,r._idx)">
+                <span class="icon"><i class="fa fa-fw fa-pencil"></i></span> <span>Edit</span>
+                </a>
+              <a v-if="r.edit_new_review&r.created_by==current_user" class="button is-link" @click="stop_edit(r._idx)"><span>Save</span></a>
+           </p>
+            <div><b>Professor:</b> <span v-if="!r.edit_new_review">{{r.teacher}}</span>
+            <span v-else><input type="text" class="input" v-model="r.teacher"></span>
+            </div>
+            <br>
+            <div>
+                <span v-if="!r.edit_new_review">{{r.review}}</span>
+                <span v-else><textarea class="textarea" v-model="r.review"></textarea> </span>
+            </div>
+            <br>
+            <div>
+                <b>Overall Rating</b>
+                <span v-if="!r.edit_new_review" v-for="star_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="star_idx <= r.rating" class="fa fa-star" style="color: rgb(230,230,0);"></i>
+                  <i v-if="star_idx > r.rating" class="fa fa-star-o" style="color: rgb(230,230,0);"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="stars_out()">
+                <span @mouseover="stars_over(star_idx)"
+					  @click="set_stars(star_idx)">
+                  <i v-if="star_idx <= new_rating" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
+                  <i v-if="star_idx > new_rating" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
+                </span>
+    	   </span>
+                </span>
+            </div>
+            <div>
+                <b>Difficulty</b>
+                <span v-if="!r.edit_new_review" v-for="bomb_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="bomb_idx <= r.difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                  <i v-if="bomb_idx > r.difficulty" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="bombs_out()">
+                <span @mouseover="bombs_over(bomb_idx)"
+					  @click="set_bombs(bomb_idx)">
+                  <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                  <i v-if="bomb_idx > new_difficulty" class="far fa-angry"  style="color: rgb(255,77,77); font-size: 20px;"></i>
+                </span>
+    	   </span>
+                </span>
+            </div>
+            <div>
+                <b>Workload</b>
+                <span  v-if="!r.edit_new_review" v-for="plane_idx in [1, 2, 3, 4, 5]">
+                  <i v-if="plane_idx <= r.workload" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                  <i v-if="plane_idx > r.workload" class="far fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                </span>
+                <span v-else>
+                    <span @mouseout="planes_out()">
+                <span @mouseover="planes_over(plane_idx)"
+					  @click="set_planes(plane_idx)">
+                  <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                  <i v-if="plane_idx > new_workload" class="far fa-paper-plane"  style="color: rgb(0,153,230)"></i>
+                </span>
+    	   </span>
+                </span>
+            </div>
+            <br>
+            <!-- Trying to get the author of each Review -->
+            <div class="is-size-6 has-text-grey"><i>by {{r.created_by_username}}</i></div>
+			<div class="is-size-6 has-text-grey"><i>created: {{r.created_time}}</i></div>
+        	<div v-if="r.created_by==current_user">
+        		<p class="has-text-right has-text-danger is-size-4"><span class="icon"><i @click="delete_review(r._idx)" class="fa fa-fw fa-trash"></i></span></p>
+        	</div>
+        </div>
+        <br>
   </div>
 </div>
-
+</div>
 
 
 [[block page_scripts]]
@@ -81,6 +248,7 @@
     let get_reviews_url = "[[=XML(get_reviews_url)]]";
     let submit_review_url = "[[=XML(submit_review_url)]]";
     let delete_review_url = "[[=XML(delete_review_url)]]";
+    let edit_review_url = "[[=XML(edit_review_url)]]";
 	let course_id = "[[=course_id]]";
 </script>
 <script src="js/display_course.js"></script>
