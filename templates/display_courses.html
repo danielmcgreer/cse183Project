@@ -1,23 +1,22 @@
 [[extend 'layout.html']]
 
-<div class="section">
+<div class="section" style="padding: 50px;">
 
-    <h1 class="title">Courses Found</h1>
+    <h1 class="title is-2">Courses Found</h1>
     <div class="is-size-4">Feel free to explore any of the course pages to get other students' perspectives!</div>
     
     <br><br>
+    
+    <!--
     <a class="button is-link" href="[[=URL('search_course')]]">
         <span>Search Another Course</span>
     </a>
-    <a class="button is-warning" href="[[=URL('index')]]">
-        <span>Back to Main Page</span>
-    </a>
-	
-	<div align="right">
-	    <a class="button is-link" href="[[=URL('add_course')]]">
-			<span>Don't see your course? Add one!</span>
-		</a>  
-	</div>
+    -->
+    <div align="left">
+        <a class="button is-warning" href="[[=URL('index')]]">
+            <span>Back to Main Page</span>
+        </a>
+    </div>
 
     <div class="container">
           <br>
@@ -50,6 +49,12 @@
             </div>
           [[pass]]
     </div>
-    <br>
+    <br><br>
+    
+    <div align="left">
+	    <a class="button is-link" href="[[=URL('add_course')]]">
+			<span>Don't see your course? Add one!</span>
+		</a>  
+	</div>
   
 </div>

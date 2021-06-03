@@ -6,20 +6,20 @@
 }
 </style>
 
-<div class="section">
+<div class="section" style="padding: 100px;">
     
 <div class="is-size-1" style="display: flex; justify-content: center;">UCSC CourseRater</div>
 
 <div class="section" id="vue-target" v-cloak>
   <div class="control block" style="display: flex;">
 <!--    <i class="fa fa-search icon is-medium" style="margin-top: 10px;" aria-hidden="true"></i>-->
-    <div class="field has-addons">
+    <div class="field has-addons" style="display: flex; justify-content: center; padding-top: 175px; width: 100%;">
+      <div class="control" style="width: 100%;">
+        <input placeholder="search for a class using keywords..." class="input is-primary is-medium" type="text" v-model="query" @keyup="search" @keyup.13="submit"/>
+      </div>
       <p class="control">
-        <input placeholder="search for a class using keywords..." class="input" type="text" v-model="query" @keyup="search" @keyup.13="submit"/>
-      </p>
-      <p class="control">
-        <button class="button is-link" @click="submit">
-          <span class="icon is-small mx-2">
+        <button class="button is-medium is-primary" @click="submit">
+          <span class="icon is-medium mx-2">
             <i class="fa fa-search" aria-hidden="true"></i>
           </span>
         </button>
@@ -27,14 +27,15 @@
     </div>
   </div>
 
-  <div class="dropdown is-active">
-    <div class="dropdown-content">
+  <div class="dropdown is-active" style="width: 100%;">
+    <div class="dropdown-content" style="width: 100%; margin-top: -20px;">
       <span v-for="r in results">
-        <a v-bind:href="r.link_display_course" class="dropdown-item has-text-link">{{r.department}} {{r.class_number}}, {{r.class_name}}</a>
+        <a v-bind:href="r.link_display_course" style="font-size: 20px;" class="dropdown-item has-text-link">{{r.department}} {{r.class_number}}, {{r.class_name}}</a>
     <!--    <br>-->
       </span>
     </div>
   </div>
+  <br><br><br><br><br><br><br><br><br><br>
 </div>
 </div>
 
