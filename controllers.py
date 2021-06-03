@@ -36,6 +36,9 @@ from pydal.validators import *
 from .models import get_user_email
 from .models import get_username
 
+def get_time():
+    return datetime.datetime.utcnow()
+
 url_signer = URLSigner(session)
 #TODO make signing everywhere and make sure you can only mess with your own reviews
 #TODO you can only write reviews for courses that exist, if course does not exist 
@@ -238,6 +241,7 @@ def submit_review(course_id):
         workload = request.json.get('workload'),
         difficulty = request.json.get('difficulty'),
         review=request.json.get('review'),
+        created_time=get_time(),
     )
     created_by = get_user_email()
 

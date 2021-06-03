@@ -42,7 +42,6 @@ db.define_table(
     Field('difficulty', 'integer',IS_INT_IN_RANGE(1, 5), requires=IS_NOT_EMPTY()),
     Field('review', 'text'),
     Field('created_time', default=get_time),
-
 )
 
 db.reviews.created_by.readable = db.reviews.created_by.writable = False
