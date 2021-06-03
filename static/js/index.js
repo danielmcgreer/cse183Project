@@ -47,21 +47,15 @@ let init = (app) => {
 
         let query = app.vue.query;
         if (query.length > 0) {
+            console.log("test!!");
+            let encoded = encodeURI(query);
+            console.log(encoded);
+            window.location.href = '../display_courses/' + encoded;
 
-            const router = new VueRouter({
-                routes: [
-                {
-                    path: 'display_courses/:major_id/:course_num',
-                    name: 'display_courses',
-                }
-                ]
-            })
-
-            axios.get(search_results_url, {params: {q: query}})
-                .then(function (result) {
-                    router.push({ name: 'display_courses', params: {major_id: result.data.department, course_num: result.data.numbers} })
-//                    window.location.href = 'display_courses/' + result.data.department + '/' + result.data.numbers;
-                });
+//            axios.get(search_results_url, {params: {q: query}})
+//                .then(function (result) {
+//                    window.location.href = '../display_courses/' + result.data.department + '/' + result.data.numbers;
+//                });
         }
     }
 

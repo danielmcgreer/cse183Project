@@ -35,6 +35,8 @@ from .common import Field
 from pydal.validators import *
 from .models import get_user_email
 
+from urllib.parse import unquote
+
 url_signer = URLSigner(session)
 #TODO make signing everywhere and make sure you can only mess with your own reviews
 #TODO you can only write reviews for courses that exist, if course does not exist 
@@ -45,7 +47,7 @@ def index():
     #Grabs reviews and associated courses
     reviews = db(db.reviews.course_id == db.courses.id).select()
     return dict(search_url=URL('search', signer=url_signer),
-                search_results_url=URL('search_results', signer=url_signer),
+                # search_results_url=URL('search_results', signer=url_signer),
                 reviews=reviews,
                 url_signer=url_signer)
 
@@ -132,6 +134,7 @@ def delete():
     db(db.reviews.id == review_id).delete()
     redirect(URL('users_reviews'))
 
+# retired page
 @action('search_course', method=["GET", "POST"])
 @action.uses(db, auth, 'search_course.html')
 def search_course():
@@ -144,21 +147,54 @@ def search_course():
 
     return dict(form=form)
 
-@action('display_courses/<major_id>/<course_num:int>')
-@action.uses(db, auth, 'display_courses.html')
-def display_courses(major_id=None, course_num=None):
-#TODO if args eq none then do something
-    if(course_num==None):
-        course_num=0
-    perfectMatches = db((db.courses.department == major_id) &
-                        (db.courses.class_number == course_num)).select()
-    closeMatches1 = db((db.courses.department == major_id) &
-                        (db.courses.class_number != course_num)).select()
-    closeMatches2 = db((db.courses.department != major_id) &
-                        (db.courses.class_number == course_num)).select()
+# @action('display_courses/<major_id>/<course_num:int>')
+# @action.uses(db, auth, 'display_courses.html')
+# def display_courses(major_id=None, course_num=None):
+# #TODO if args eq none then do something
+#     if(course_num==None):
+#         course_num=0
+#     perfectMatches = db((db.courses.department == major_id) &
+#                         (db.courses.class_number == course_num)).select()
+#     closeMatches1 = db((db.courses.department == major_id) &
+#                         (db.courses.class_number != course_num)).select()
+#     closeMatches2 = db((db.courses.department != major_id) &
+#                         (db.courses.class_number == course_num)).select()
+#
+#     allMatches = perfectMatches+closeMatches1+closeMatches2
+#     return dict(allMatches=allMatches, url_signer=url_signer)
 
-    allMatches = perfectMatches+closeMatches1+closeMatches2
-    return dict(allMatches=allMatches, url_signer=url_signer)
+
+@action('display_courses/<search_string>')
+@action.uses(db, auth, 'display_courses.html')
+def display_courses(search_string=None):
+    #TODO if args eq none then do something
+
+    search_string = unquote(search_string)
+
+    numbers = ""
+    letters = ""
+    first = True
+
+    for word in search_string.split():
+        if word.isdigit():
+            numbers += word
+        else:
+            if first:
+                letters += word
+                first = False
+            else:
+                letters = letters + " " + word
+
+    if len(numbers) > 0:
+        numbers = numbers + "%"
+    if len(letters) > 0:
+        letters = letters + "%"
+
+    results = db((db.courses.class_name.like(letters)) |
+                 (db.courses.department.like(letters)) |
+                 (db.courses.class_number.like(numbers))).select()
+
+    return dict(allMatches=results, url_signer=url_signer)
 
 
 @action('display_course/<major_id>/<course_num:int>')
@@ -241,27 +277,25 @@ def search():
     return dict(results=results)
 
 
-@action('search_results')
-@action.uses()
-def search_results():
-    q = request.params.get("q")
-
-    numbers = "00"
-    department = "null"
-
-    for word in q.split():
-        if word.isdigit():
-            numbers = word
-            break
-        else:
-            if (len(word) == 3) or (len(word) == 4):
-                department = word
-                break
-
-    # redirect(URL('display_courses', department, numbers))
-    newNumbers = int(numbers)
-
-    return dict(numbers=newNumbers, department=department)
+# @action('search_results')
+# @action.uses()
+# def search_results():
+#     q = request.params.get("q")
+#
+#     numbers = "00"
+#     department = "null"
+#
+#     for word in q.split():
+#         if word.isdigit():
+#             numbers = word
+#         else:
+#             if (len(word) == 3) or (len(word) == 4):
+#                 department = word
+#
+#     newNumbers = int(numbers)
+#     department = department.upper()
+#
+#     return dict(numbers=newNumbers, department=department)
 
 
 @action('write_review/<course_id>', method=["GET", "POST"])
