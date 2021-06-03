@@ -62,9 +62,9 @@
   </a>
   -->
   
-  <div align="right">
+  <div align="left">
       <a class="button is-warning" href="[[=URL('index')]]">
-        <span>Back to Main Page</span>
+        <span>Back to Search</span>
       </a>
   </div>
   
@@ -101,8 +101,8 @@
                 <span @mouseover="stars_over(star_idx)"
 					  @click="set_stars(star_idx)"
                       v-for="star_idx in [1, 2, 3, 4, 5]">
-                  <i v-if="star_idx <= new_rating" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
-                  <i v-if="star_idx > new_rating" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
+                  <i v-if="star_idx <= rating_shown" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
+                  <i v-if="star_idx > rating_shown" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
                 </span>
     	   </span>
 	   </div>
@@ -120,8 +120,8 @@
                     <span @mouseover="bombs_over(bomb_idx)"
     					  @click="set_bombs(bomb_idx)"
                           v-for="bomb_idx in [1, 2, 3, 4, 5]">
-                      <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
-                      <i v-if="bomb_idx > new_difficulty" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                      <i v-if="bomb_idx <= difficulty_shown" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                      <i v-if="bomb_idx > difficulty_shown" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
                     </span>
     	   </span>
 	   </div>
@@ -139,8 +139,8 @@
                     <span @mouseover="planes_over(plane_idx)"
     					  @click="set_planes(plane_idx)"
                           v-for="plane_idx in [1, 2, 3, 4, 5]">
-                      <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
-                      <i v-if="plane_idx > new_workload" class="far fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
+                      <i v-if="plane_idx <= workload_shown" class="fas fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
+                      <i v-if="plane_idx > workload_shown" class="far fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
                     </span>
     	   </span>
 	   </div>

@@ -18,6 +18,9 @@ let init = (app) => {
 		new_rating: 0,
 		new_workload: 0,
 		new_difficulty: 0,
+		rating_shown: 0,
+		difficulty_shown: 0,
+		workload_shown: 0,
 		new_review: "",
 		author:"",
 		current_user:"",
@@ -172,6 +175,9 @@ let init = (app) => {
         app.vue.new_rating = 0;
 		app.vue.new_workload = 0;
         app.vue.new_difficulty = 0;
+		app.vue.rating_shown= 0;
+		app.vue.difficulty_shown= 0;
+		app.vue.workload_shown= 0;
     };
 
     app.enumerate = (a) => {
@@ -189,43 +195,46 @@ let init = (app) => {
 
     // Star Rating
     app.stars_out = () => {
-        app.vue.new_rating = new_rating;
+        app.vue.rating_shown = app.vue.new_rating;
     };
 
     app.stars_over = (num_stars) => {
-        app.vue.new_rating = num_stars;
+        app.vue.rating_shown = num_stars;
     };
 
     app.set_stars = (num_stars) => {
-        new_rating = num_stars;
+		app.vue.rating_shown = num_stars;
+        app.vue.new_rating = num_stars;
         // Sets the stars on the server.
     };
     
     // Difficulty Rating
     app.bombs_out = () => {
-        app.vue.new_difficulty = new_difficulty;
+        app.vue.difficulty_shown = app.vue.new_difficulty;
     };
 
     app.bombs_over = (num_bombs) => {
-        app.vue.new_difficulty = num_bombs;
+        app.vue.difficulty_shown = num_bombs;
     };
 
     app.set_bombs = (num_bombs) => {
-        new_difficulty = num_bombs;
+        app.vue.new_difficulty = num_bombs;
+		app.vue.difficulty_shown = num_bombs;
         // Sets the bombs on the server.
     };
     
     // Workload
     app.planes_out = () => {
-        app.vue.new_workload = new_workload;
+        app.vue.workload_shown = app.vue.new_workload;
     };
 
     app.planes_over = (num_planes) => {
-        app.vue.new_workload = num_planes;
+        app.vue.workload_shown = num_planes;
     };
 
     app.set_planes = (num_planes) => {
-        new_workload = num_planes;
+        app.vue.new_workload = num_planes;
+		app.vue.workload_shown = num_planes;
         // Sets the planes on the server.
     };
 
@@ -270,6 +279,9 @@ let init = (app) => {
 		new_rating=0;
         new_workload=0;
 		new_difficulty=0;
+		rating_shown=0;
+		difficulty_shown=0;
+		workload_shown=0;
 		not_logged_in_wanring=false;
 		no_teacher_warning= false;
 		no_rating_wanring= false;
