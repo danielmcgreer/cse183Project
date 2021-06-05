@@ -97,9 +97,9 @@
 	   <label for="rating" style="font-size: 18px;"><b>Overall Class Rating</b></label>
 	   <br>
 	   <div class="box">
-    	   <span @mouseout="stars_out()">
+    	   <span @mouseout="stars_out(null)">
                 <span @mouseover="stars_over(star_idx)"
-					  @click="set_stars(star_idx)"
+					  @click="set_stars(null,star_idx)"
                       v-for="star_idx in [1, 2, 3, 4, 5]">
                   <i v-if="star_idx <= rating_shown" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
                   <i v-if="star_idx > rating_shown" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
@@ -118,7 +118,7 @@
 	   <div class="box">
     	   <span @mouseout="bombs_out()">
                     <span @mouseover="bombs_over(bomb_idx)"
-    					  @click="set_bombs(bomb_idx)"
+    					  @click="set_bombs(null, bomb_idx)"
                           v-for="bomb_idx in [1, 2, 3, 4, 5]">
                       <i v-if="bomb_idx <= difficulty_shown" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
                       <i v-if="bomb_idx > difficulty_shown" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
@@ -137,7 +137,7 @@
 	   <div class="box">
     	   <span @mouseout="planes_out()">
                     <span @mouseover="planes_over(plane_idx)"
-    					  @click="set_planes(plane_idx)"
+    					  @click="set_planes(null,plane_idx)"
                           v-for="plane_idx in [1, 2, 3, 4, 5]">
                       <i v-if="plane_idx <= workload_shown" class="fas fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
                       <i v-if="plane_idx > workload_shown" class="far fa-paper-plane" style="color: rgb(0,153,230); font-size: 20px;"></i>
@@ -191,11 +191,11 @@
                   <i v-if="star_idx > r.rating" class="fa fa-star-o" style="color: rgb(230,230,0);"></i>
                 </span>
                 <span v-else>
-                    <span @mouseout="stars_out()">
+                    <span @mouseout="stars_out(r._idx)">
                 <span @mouseover="stars_over(star_idx)"
-					  @click="set_stars(star_idx)">
-                  <i v-if="star_idx <= new_rating" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
-                  <i v-if="star_idx > new_rating" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
+					  @click="set_stars(r._idx,star_idx)">
+                  <i v-if="star_idx <= rating_shown" class="fas fa-star" style="color: rgb(230,230,0); font-size: 20px;"></i>
+                  <i v-if="star_idx > rating_shown" class="far fa-star"  style="color: rgb(230,230,0); font-size: 20px;"></i>
                 </span>
     	   </span>
                 </span>
@@ -207,11 +207,11 @@
                   <i v-if="bomb_idx > r.difficulty" class="far fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
                 </span>
                 <span v-else>
-                    <span @mouseout="bombs_out()">
+                    <span @mouseout="bombs_out(r._idx)">
                 <span @mouseover="bombs_over(bomb_idx)"
-					  @click="set_bombs(bomb_idx)">
-                  <i v-if="bomb_idx <= new_difficulty" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
-                  <i v-if="bomb_idx > new_difficulty" class="far fa-angry"  style="color: rgb(255,77,77); font-size: 20px;"></i>
+					  @click="set_bombs(r._idx,bomb_idx)">
+                  <i v-if="bomb_idx <= difficulty_shown" class="fas fa-angry" style="color: rgb(255,77,77); font-size: 20px;"></i>
+                  <i v-if="bomb_idx > difficulty_shown" class="far fa-angry"  style="color: rgb(255,77,77); font-size: 20px;"></i>
                 </span>
     	   </span>
                 </span>
@@ -223,11 +223,11 @@
                   <i v-if="plane_idx > r.workload" class="far fa-paper-plane" style="color: rgb(0,153,230)"></i>
                 </span>
                 <span v-else>
-                    <span @mouseout="planes_out()">
+                    <span @mouseout="planes_out(r._idx)">
                 <span @mouseover="planes_over(plane_idx)"
-					  @click="set_planes(plane_idx)">
-                  <i v-if="plane_idx <= new_workload" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
-                  <i v-if="plane_idx > new_workload" class="far fa-paper-plane"  style="color: rgb(0,153,230)"></i>
+					  @click="set_planes(r._idx,plane_idx)">
+                  <i v-if="plane_idx <= workload_shown" class="fas fa-paper-plane" style="color: rgb(0,153,230)"></i>
+                  <i v-if="plane_idx > workload_shown" class="far fa-paper-plane"  style="color: rgb(0,153,230)"></i>
                 </span>
     	   </span>
                 </span>

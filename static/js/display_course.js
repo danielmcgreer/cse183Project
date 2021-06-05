@@ -35,6 +35,7 @@ let init = (app) => {
     };
 
     app.set_add_status = function (new_status) {
+        app.enumerate(app.vue.reviews_list);
 		if(app.vue.current_user == null){
 			app.vue.not_logged_in_wanring = true;
 			return;
@@ -106,7 +107,7 @@ let init = (app) => {
 
     app.get_reviews = () => {
 		axios.get(get_reviews_url+'/'+course_id).then(function (response) {
-            app.vue.reviews_list = app.decorate(app.enumerate(response.data.the_reviews));
+            app.vue.reviews_list = app.enumerate(response.data.the_reviews);
             app.vue.current_user=response.data.name;
             app.vue.avg_rating=response.data.avg_review;
             app.vue.avg_difficulty=response.data.avg_difficulty;
@@ -140,12 +141,12 @@ let init = (app) => {
 		}
 		app.vue.adding_new_review=false;
         app.vue.reviews_list[row_idx].edit_new_review = new_status;
-        new_rating=app.vue.reviews_list[row_idx].rating;
-        app.vue.new_rating = new_rating;
-        new_difficulty=app.vue.reviews_list[row_idx].difficulty;
-        app.vue.new_difficulty = new_difficulty;
-        new_workload=app.vue.reviews_list[row_idx].workload;
-        app.vue.new_workload = new_workload;
+        rating_shown=app.vue.reviews_list[row_idx].rating;
+        app.vue.rating_shown = rating_shown;
+        difficulty_shown=app.vue.reviews_list[row_idx].difficulty;
+        app.vue.difficulty_shown = difficulty_shown;
+        workload_shown=app.vue.reviews_list[row_idx].workload;
+        app.vue.workload_shown = workload_shown;
     };
 
     app.stop_edit = function (row_idx) {
@@ -155,9 +156,9 @@ let init = (app) => {
                 id: r.id,
                 teacher: r.teacher,
                 review: r.review,
-                rating: new_rating,
-                difficulty: new_difficulty,
-                workload: new_workload
+                rating: r.rating,
+                difficulty: r.difficulty,
+                workload: r.workload,
             }).then(function (response) {
                app.get_reviews();
                app.set_edit_status(false,row_idx);
@@ -188,53 +189,83 @@ let init = (app) => {
         });
         return a;
     };
-    app.decorate = (a) => {
-        a.map((e) => {e._state = {teacher: "clean", review: "clean"} ;});
-        return a;
-    }
 
     // Star Rating
-    app.stars_out = () => {
-        app.vue.rating_shown = app.vue.new_rating;
+    app.stars_out = (r_idx) => {
+        if(r_idx==null){
+             app.vue.rating_shown = app.vue.new_rating;
+        }
+        else{
+            app.vue.rating_shown = app.vue.reviews_list[r_idx].rating;
+        }
+
     };
 
     app.stars_over = (num_stars) => {
         app.vue.rating_shown = num_stars;
     };
 
-    app.set_stars = (num_stars) => {
-		app.vue.rating_shown = num_stars;
-        app.vue.new_rating = num_stars;
+    app.set_stars = (r_idx, num_stars) => {
+        if(r_idx==null){
+            app.vue.rating_shown = num_stars;
+            app.vue.new_rating = num_stars;
+        }
+        else{
+            app.vue.rating_shown = num_stars;
+            app.vue.reviews_list[r_idx].rating = num_stars;
+            }
         // Sets the stars on the server.
     };
     
     // Difficulty Rating
-    app.bombs_out = () => {
-        app.vue.difficulty_shown = app.vue.new_difficulty;
+    app.bombs_out = (r_idx=null) => {
+        if(r_idx==null){
+             app.vue.difficulty_shown = app.vue.new_difficulty;
+        }
+        else{
+            app.vue.difficulty_shown = app.vue.reviews_list[r_idx].difficulty;
+        }
     };
 
     app.bombs_over = (num_bombs) => {
         app.vue.difficulty_shown = num_bombs;
     };
 
-    app.set_bombs = (num_bombs) => {
-        app.vue.new_difficulty = num_bombs;
-		app.vue.difficulty_shown = num_bombs;
+    app.set_bombs = (r_idx,num_bombs) => {
+        if(r_idx==null){
+            app.vue.difficulty_shown = num_bombs;
+            app.vue.new_difficulty = num_bombs;
+        }
+        else{
+            app.vue.difficulty_shown = num_bombs;
+            app.vue.reviews_list[r_idx].difficulty = num_bombs;
+            }
         // Sets the bombs on the server.
     };
     
     // Workload
-    app.planes_out = () => {
-        app.vue.workload_shown = app.vue.new_workload;
+    app.planes_out = (r_idx=null) => {
+        if(r_idx==null){
+             app.vue.workload_shown = app.vue.new_workload;
+        }
+        else{
+            app.vue.workload_shown = app.vue.reviews_list[r_idx].workload;
+        }
     };
 
     app.planes_over = (num_planes) => {
         app.vue.workload_shown = num_planes;
     };
 
-    app.set_planes = (num_planes) => {
-        app.vue.new_workload = num_planes;
-		app.vue.workload_shown = num_planes;
+    app.set_planes = (r_idx=null, num_planes) => {
+        if(r_idx==null){
+            app.vue.workload_shown = num_planes;
+            app.vue.new_workload = num_planes;
+        }
+        else{
+            app.vue.workload_shown = num_planes;
+            app.vue.reviews_list[r_idx].workload = num_planes;
+            }
         // Sets the planes on the server.
     };
 
