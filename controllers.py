@@ -60,7 +60,7 @@ def add_course():
     form = Form([Field('department', requires=IS_NOT_EMPTY()),
                 Field('class_number',  'integer', requires=IS_NOT_EMPTY()),
                 Field('class_name', requires=IS_NOT_EMPTY()),
-                Field('class_description', 'text', requires=IS_NOT_EMPTY())],
+                Field('class_description', 'text', requires=IS_NOT_EMPTY(), default="")],
                 csrf_session=session, formstyle=FormStyleBulma)
 
     # if form is accepted
