@@ -7,6 +7,7 @@ This file is provided as an example:
 """
 import os
 from py4web.core import required_folder
+from .private.secret_settings import *
 
 # db settings
 APP_FOLDER = os.path.dirname(__file__)
@@ -19,11 +20,22 @@ DB_POOL_SIZE = 1
 DB_MIGRATE = True
 DB_FAKE_MIGRATE = False  # maybe?
 
+# Google Cloud Database
+CLOUD_DB_URI = "google:MySQLdb://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}?unix_socket=/cloudsql/{DB_CONNECTION}".format(
+    DB_USER=DB_USER,
+    DB_NAME=DB_NAME,
+    DB_PASSWORD=DB_PASSWORD,
+    DB_CONNECTION=DB_CONNECTION
+)
+CLOUD_DB_POOL_SIZE = 1
+CLOUD_DB_MIGRATE = False # IMPORTANT!
+CLOUD_DB_FAKE_MIGRATE = False
+
 # location where static files are stored:
-STATIC_FOLDER = required_folder(APP_FOLDER, "static")
+# STATIC_FOLDER = required_folder(APP_FOLDER, "static")
 
 # location where to store uploaded files:
-UPLOAD_FOLDER = required_folder(APP_FOLDER, "uploads")
+# UPLOAD_FOLDER = required_folder(APP_FOLDER, "uploads")
 
 # send email on regstration
 VERIFY_EMAIL = True
@@ -47,7 +59,7 @@ SMTP_TLS = False
 
 # session settings
 SESSION_TYPE = "database"
-SESSION_SECRET_KEY = "7355c448-d6a2-4ed1-88d5-11ffb1464ac2" # replace this with a uuid
+SESSION_SECRET_KEY = "<session-secret-key>" # replace this with a uuid
 MEMCACHE_CLIENTS = ["127.0.0.1:11211"]
 REDIS_SERVER = "localhost:6379"
 
@@ -55,10 +67,6 @@ REDIS_SERVER = "localhost:6379"
 LOGGERS = [
     "warning:stdout"
 ]  # syntax "severity:filename" filename can be stderr or stdout
-
-# single sign on Google (will be used if provided)
-OAUTH2GOOGLE_CLIENT_ID = None
-OAUTH2GOOGLE_CLIENT_SECRET = None
 
 # single sign on Okta (will be used if provided. Please also add your tenant
 # name to py4web/utils/auth_plugins/oauth2okta.py. You can replace the XXX
@@ -90,6 +98,6 @@ CELERY_BROKER = "redis://localhost:6379/0"
 
 # try import private settings
 try:
-    from .settings_private import *
+    from .private.secret_settings import *
 except (ImportError, ModuleNotFoundError):
     pass
