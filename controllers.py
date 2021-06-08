@@ -294,7 +294,7 @@ def edit_review():
 
 
 @action('get_reviews/<course_id:int>')
-@action.uses(db)
+@action.uses(db, auth)
 def get_reviews(course_id):
 
     # grab all reviews with that course
@@ -335,8 +335,8 @@ def users_reviews():
     return dict(the_reviews=the_reviews,delete_review_url = URL('delete_review', signer=url_signer),edit_review_url = URL('edit_review'), get_users_reviews_url = URL('get_users_reviews'), url_signer=url_signer)
 
 @action('get_users_reviews')
-@action.uses(db)
-def get_reviews():
+@action.uses(db, auth)
+def get_users_reviews():
     the_reviews = db((db.reviews.created_by == get_user_email()) &
                 (db.courses.id == db.reviews.course_id)).select().as_list()
     return dict(the_reviews=the_reviews)
